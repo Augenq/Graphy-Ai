@@ -17,7 +17,7 @@
 - **Режимы занятия:** «Объяснение», «Квиз» (вопросы без подсказок, разбор после отчёта, необязательный таймер) и «Материалы» (конспекты, раздатки и презентации файлами: PDF, DOCX, PPTX, XLSX).
 - **Инструменты агента:** веб-поиск и чтение страниц, исследователь-субагент, песочница с Python, LaTeX, OCR, pandoc; загрузка файлов, фото и голосовой ввод.
 - **Школа (MAX).** Роли «Ученик» и «Учитель»: учитель создаёт классы, выдаёт тесты и материалы, видит результаты и проверяет свободные ответы; ученик проходит тест с таймером и сохранением черновика.
-- **Любая модель:** OpenRouter, OpenAI, Anthropic, Google, DeepSeek и другие, а также локальные (Ollama, LM Studio, llama.cpp). Ключ хранится на сервере и в MAX не виден пользователям.
+- **Работает без настройки.** Модели подключены через сервис Graphy (запрос идёт на наш сервер, затем в OpenRouter с ключом сервера); пользователь выбирает только качество ответа: «Быстрый», «Сбалансированный», «Глубокий». Ключ сервера нигде не виден.
 
 <table>
   <tr>
@@ -56,7 +56,7 @@
 # или: docker build -t graphy:latest .         # дольше, всё внутри Docker
 
 # или загрузить готовый образ: graphy-image.tar.gz из раздела Releases
-# https://github.com/Augenq/Graphy-Ai/releases/latest  (sha256: 68ef7da825ef06e0db8e7ab541d9d1f6c560f4d165a0354ec49ee87032cd4f7e)
+# https://github.com/Augenq/Graphy-Ai/releases/latest  (sha256: c36d175b5ee9911de16205d5a741cc1908d8e7b5b07e27128fb7bb93781997f4)
 docker load < graphy-image.tar.gz              # → graphy:latest
 ```
 
@@ -66,11 +66,12 @@ docker load < graphy-image.tar.gz              # → graphy:latest
 docker run -d --name graphy --restart unless-stopped \
   -p 127.0.0.1:5174:5174 \
   -v graphy-data:/data -v graphy-workspace:/workspace \
-  -e OPENROUTER_API_KEY=sk-or-... \
   graphy:latest
 ```
 
-Откройте <http://localhost:5174>. Ключ модели можно не передавать переменной, а ввести в «Настройки → Модели и провайдеры» (поддерживаются и другие провайдеры, см. [backend/PROVIDERS.md](backend/PROVIDERS.md)). Данные хранятся в томах `graphy-data` и `graphy-workspace`.
+Откройте <http://localhost:5174>: ключ не нужен. Запросы к модели идут через сервис Graphy (https://78-17-61-24.sslip.io:8443), у него суточные лимиты на установку, IP и общий расход; контейнеру нужен доступ в интернет. Данные хранятся в томах `graphy-data` и `graphy-workspace`.
+
+Свой провайдер без сервиса Graphy: `-e GRAPHY_SERVICE_URL=off -e OPENROUTER_API_KEY=sk-or-...` (и другие ключи, см. [backend/PROVIDERS.md](backend/PROVIDERS.md)).
 
 Ту же конфигурацию с поиском SearXNG поднимает `docker compose up -d`.
 
