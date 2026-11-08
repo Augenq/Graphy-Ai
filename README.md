@@ -56,12 +56,12 @@ Graphy — агент для школы: учителю помогает гот�
     <td align="center">Настройки</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/screenshot-2120.jpg" alt="Graphy — скриншот"></td>
-    <td><img src="docs/screenshots/screenshot-2127.jpg" alt="Graphy — скриншот"></td>
+    <td><img src="docs/screenshots/chat-diagram.jpg" alt="Чат со схемой от ИИ"></td>
+    <td><img src="docs/screenshots/ai-generated-material.jpg" alt="PDF-материал, сгенерированный ИИ"></td>
   </tr>
   <tr>
-    <td align="center">Скриншот</td>
-    <td align="center">Скриншот</td>
+    <td align="center">Чат: схема от ИИ</td>
+    <td align="center">Сгенерированный материал (PDF)</td>
   </tr>
 </table>
 
