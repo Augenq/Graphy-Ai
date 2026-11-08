@@ -72,7 +72,7 @@ fn prefs_for(q: &str, context_tokens: Option<usize>) -> (Vec<&'static str>, &'st
             if context_tokens.unwrap_or(0) > BALANCED_LONG_CONTEXT {
                 (vec!["openai/gpt-6.1-terra", "gpt-6.1-terra"], "medium")
             } else {
-                (vec!["anthropic/claude-haiku-5-5", "claude-haiku-5-5"], "medium")
+                (vec!["anthropic/claude-haiku-5-5", "claude-haiku-5-5"], "high")
             }
         }
     }
