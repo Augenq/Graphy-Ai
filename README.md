@@ -55,7 +55,8 @@
 ./scripts/docker-build.sh                      # → graphy:latest
 # или: docker build -t graphy:latest .         # дольше, всё внутри Docker
 
-# или загрузить готовый образ из релиза репозитория
+# или загрузить готовый образ: graphy-image.tar.gz из раздела Releases
+# https://github.com/Augenq/Graphy-Ai/releases/latest  (sha256: 68ef7da825ef06e0db8e7ab541d9d1f6c560f4d165a0354ec49ee87032cd4f7e)
 docker load < graphy-image.tar.gz              # → graphy:latest
 ```
 
