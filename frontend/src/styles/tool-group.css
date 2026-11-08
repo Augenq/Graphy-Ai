@@ -1,0 +1,11 @@
+/* Grouped tool calls: live state and bounded live list. */
+.tool-group .trace-list { padding-left: 24px; }
+.tool-group-more { font: 400 12px/16px var(--font-sans); color: var(--ink-3); padding: 2px 0; }
+
+.ui-menu-option:has(.ui-menu-heading) { opacity: 1; cursor: default; }
+.ui-menu-heading { display: block; padding-block: 2px; color: var(--ink-3); font: 500 12px/18px var(--font-sans); }
+@media (prefers-reduced-motion: reduce) {
+  .trace-chev { transition: none; }
+}
+.tool-group .tool-group-count { flex-shrink: 0; }
+.tool-group .trace .tool-group-count { margin-left: 2px; }

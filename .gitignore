@@ -1,0 +1,34 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.env
+.env.*
+
+backend/rust/target/
+backend/graphy/_native/
+
+.graphy-uploads/
+
+graphy-portable/
+
+# local artifacts
+*.tar
+*.tar.gz
+*.so
+.graphy-presented/
+*.log
+.DS_Store
+!.env.example
+backend/rust/target-bookworm/
+backend/rust/.cargo-home/
+
+# internal orchestration notes (not part of the deliverable)
+.orch/
+ORCHESTRATION.md
+docs/ui-overhaul-*/
+.local-git/

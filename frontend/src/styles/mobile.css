@@ -1,0 +1,151 @@
+/* A phone is a single working pane. Desktop retains its own density and zoom. */
+.mobile-brand, .mobile-new { display: none; }
+
+@media (max-width: 600px) {
+  :root {
+    --ui-scale: 0.9; /* phones: a denser, calmer layout (browser text size on some phones renders everything large) */
+    --sb-w: min(360px, calc(100vw - 24px));
+    --bar-h: 64px;
+    --control-xs: 44px; --control-sm: 44px; --control-md: 44px; --control-lg: 48px;
+    --display-size: 28px; --display-lh: 34px;
+    --content-size: 16px;
+    --content-lh: 26px;
+    --md-sys-typescale-body-medium-size: 16px;
+    --md-sys-typescale-body-medium-line-height: 24px;
+    --md-sys-typescale-body-small-size: 14px;
+    --md-sys-typescale-body-small-line-height: 20px;
+    --md-sys-typescale-label-medium-size: 12px;
+    --md-list-item-label-text-size: 16px;
+    --md-list-item-label-text-line-height: 24px;
+    --md-list-item-supporting-text-size: 13px;
+    --md-list-item-one-line-container-height: 52px;
+    --md-list-item-two-line-container-height: 68px;
+    --md-list-item-leading-icon-size: 22px;
+    --md-icon-size: 22px;
+    --md-icon-button-icon-size: 22px;
+    --md-icon-button-state-layer-width: 44px;
+    --md-icon-button-state-layer-height: 44px;
+    --md-filled-icon-button-container-width: 44px;
+    --md-filled-icon-button-container-height: 44px;
+    --md-filled-icon-button-icon-size: 22px;
+    --md-outlined-icon-button-container-width: 44px;
+    --md-outlined-icon-button-container-height: 44px;
+    --md-filled-button-container-height: 44px;
+    --md-filled-tonal-button-container-height: 44px;
+    --md-outlined-button-container-height: 44px;
+    --md-text-button-container-height: 44px;
+    --md-filled-button-label-text-size: 14px;
+    --md-filled-tonal-button-label-text-size: 14px;
+    --md-outlined-button-label-text-size: 14px;
+    --md-text-button-label-text-size: 14px;
+    --md-secondary-tab-container-height: 48px;
+    --md-secondary-tab-label-text-size: 14px;
+    --md-filter-chip-container-height: 44px;
+    --md-assist-chip-container-height: 44px;
+    --md-input-chip-container-height: 44px;
+    --md-switch-track-width: 48px;
+    --md-switch-track-height: 28px;
+    --md-checkbox-state-layer-size: 44px;
+    --md-radio-state-layer-size: 44px;
+    --md-icon-button-pressed-state-layer-opacity: .12;
+    --md-list-item-pressed-state-layer-opacity: .12;
+    --md-filled-button-pressed-state-layer-opacity: .12;
+    --md-filled-icon-button-pressed-state-layer-opacity: .12;
+  }
+  html[data-textsize="s"] { --content-size: 15px; --content-lh: 24px; }
+  html[data-textsize="l"] { --content-size: 18px; --content-lh: 28px; }
+  html, body, #root { height: calc(100 * var(--app-dvh)); }
+  .graphy-workspace {
+    position: fixed; top: var(--mobile-viewport-top, 0px); left: 0;
+    height: var(--mobile-viewport-height, calc(100 * var(--app-dvh)));
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .graphy-canvas { min-height: 0; }
+  button, a, md-icon-button, md-list-item { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  md-icon-button, md-filled-icon-button, md-outlined-icon-button, .sidebar-delete {
+    width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+  }
+  md-icon-button svg { width: 22px; height: 22px; }
+  .send-button {
+    /* 32px visible button inside the same 44px touch target as adjacent controls. */
+    box-sizing: border-box;
+    padding: 6px;
+    --md-filled-icon-button-container-width: 32px;
+    --md-filled-icon-button-container-height: 32px;
+    --md-filled-icon-button-icon-size: 18px;
+  }
+  .quiet-trigger, .select-trigger { height: 44px; min-height: 44px; font-size: 14px; }
+  .select-trigger { min-width: 160px; }
+  .tip-label { display: none; }
+  .app-topbar, .session-bar { height: 64px; gap: 8px; padding-inline: 12px !important; }
+  .app-topbar-title { flex: 1; }
+  .mobile-brand { display: block; flex: 1; text-align: center; font-size: 25px; }
+  .mobile-new { display: inline-flex; }
+  .session-title { flex: 1; }
+  .session-title h1 { font-size: 16px; line-height: 22px; }
+  .session-title > div { font-size: 12px; line-height: 18px; }
+  .session-progress { display: none; } /* The complete plan is one tap away in the panel. */
+  .sidebar-overlay { max-width: calc(100% - 24px); }
+  nav[data-sidebar] { padding: env(safe-area-inset-top) 12px max(12px, env(safe-area-inset-bottom)); border-right: 0; }
+  nav[data-sidebar] > .chrome { height: 72px; padding-left: 12px !important; }
+  nav[data-sidebar] .graphy-wordmark { font-size: 32px; }
+  nav[data-sidebar] md-list-item { height: 52px; --md-list-item-one-line-container-height: 52px; border-radius: 14px; }
+  nav[data-sidebar] .new-lesson { height: var(--control-lg); font-size: 16px; line-height: 24px; margin-bottom: var(--space-12); }
+  nav[data-sidebar] .new-lesson-icon { width: 22px; height: 22px; }
+  nav[data-sidebar] .sidebar-logo .graphy-mark { width: 28px; height: 28px; }
+  nav[data-sidebar] md-list-item [slot="start"] svg { width: 22px; height: 22px; }
+  nav[data-sidebar] h2 { font-size: 14px; line-height: 20px; padding-block: 12px 6px; }
+  nav[data-sidebar] kbd { display: none; }
+  .sidebar-session-meta { gap: 4px; font-size: 12px; }
+  .row-menu, md-list-item:hover .row-menu, md-list-item:focus-within .row-menu { width: 44px; margin-left: 0; opacity: 1; }
+  .sidebar-delete { margin: 0; }
+  .state-section-head { min-height: 44px; }
+
+  /* Composer: the toolbar and the options tray each keep one row (styles/composer.css). */
+  .lesson-composer { padding: 4px 12px max(8px, env(safe-area-inset-bottom)); }
+  .chat-input, .home-composer .chat-input { --md-filled-text-field-input-text-size: 16px; --md-filled-text-field-input-text-line-height: 24px; }
+  .chat-input { max-height: min(200px, 30dvh); overflow-y: auto; }
+  .composer-waiting { padding: 8px 16px max(12px, env(safe-area-inset-bottom)); }
+  .agent-status { font-size: 12px; line-height: 18px; }
+  .thread-region { display: flex; flex-direction: column; }
+  .thread-region > [role="log"] { flex: 1; min-height: 0; height: auto; }
+  .thread-fade { mask-image: none; }
+  [role="log"] > div { padding: 20px 16px 24px; }
+  .jump-to-latest { width: 44px; height: 44px; bottom: 8px; }
+  .copy-action { min-height: 44px; }
+  .trace { min-height: 32px; font-size: 14px; line-height: 22px; }
+  .trace-chev { opacity: 1; }
+  .trace-result { flex-shrink: 1; }
+  .md pre { font-size: 13px; line-height: 20px; }
+  .md table { font-size: 14px; line-height: 21px; }
+
+  .home-content { padding: var(--space-24) var(--space-16) max(var(--space-24), env(safe-area-inset-bottom)); }
+  .home-grid { display: none; }
+  .home-hero { flex-direction: column; gap: var(--space-12); margin-bottom: var(--space-24); } /* the mark stands above a heading that wraps */
+  .home-mark { display: none; }
+  .home-screen section[aria-labelledby="resume-title"] { margin-top: 28px; }
+  .home-screen md-list-item { --md-list-item-leading-space: 8px; --md-list-item-trailing-space: 8px; }
+
+  /* The search dialog and the skill editor are full screens on a phone (Settings is a page of its own: styles/settings-page.css). */
+  .graphy-dialog.dialog-settings, .graphy-dialog.dialog-search {
+    width: 100vw; max-width: 100vw; height: var(--mobile-viewport-height, calc(100 * var(--app-dvh)));
+    max-height: var(--mobile-viewport-height, calc(100 * var(--app-dvh))); margin: 0;
+    --md-dialog-container-shape: 0px;
+  }
+  .dialog-settings .graphy-dialog-content, .dialog-search .graphy-dialog-content { height: var(--mobile-viewport-height, calc(100 * var(--app-dvh))); max-height: none; }
+  .search-field, .palette-search { --md-filled-text-field-input-text-size: 16px; --md-filled-text-field-input-text-line-height: 24px; --md-filled-text-field-top-space: 10px; --md-filled-text-field-bottom-space: 10px; }
+  .ui-field input { font-size: 16px; }
+  .palette-footer { display: none; }
+  .palette-search-bar { padding-top: max(12px, env(safe-area-inset-top)); }
+  .search-result { min-height: 64px; }
+  .palette-results { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  md-menu { min-width: 0 !important; max-width: calc(100vw - 24px); }
+  md-menu-item { --md-menu-item-one-line-container-height: 44px; --md-menu-item-label-text-size: 14px; --md-menu-item-label-text-line-height: 20px; --md-menu-item-top-space: 10px; --md-menu-item-bottom-space: 10px; }
+  .menu-search input { min-height: 36px; font-size: 16px; }
+  .question-form { padding: 16px; }
+  .question-actions { gap: 8px; }
+  .skills-view.skills-view { padding-inline: 16px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .skill-editor-head, .skill-editor-foot { flex-wrap: wrap; }
+}

@@ -1,0 +1,12 @@
+/* Appearance settings (task D): answer font and the animation override. Both are data attributes on <html> (lib/settings.ts). */
+/* Only answer bodies (the assistant message wrapper and the settings preview); documents, question forms and widgets keep the sans font. */
+:root { --font-answer-serif: Georgia, "Times New Roman", serif; }
+html[data-font="serif"] .group\/msg .md, html[data-font="serif"] [data-preview-column] .md { font-family: var(--font-answer-serif); }
+html[data-font="serif"] .group\/msg .md code, html[data-font="serif"] .group\/msg .md pre, html[data-font="serif"] [data-preview-column] .md code { font-family: var(--font-mono); }
+html[data-font="serif"] .group\/msg .md table { font-family: var(--font-sans); }
+/* «Анимации: выкл» = the same rule as the system reduced-motion preference */
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+}
+html[data-motion="off"] .shimmer-text, html[data-motion="off"] .trace-verb.shimmer-text { color: var(--ink-2); background: none; animation: none; }
+html[data-motion="off"] .home-grid::before { animation: none; }

@@ -1,0 +1,11 @@
+
+
+/* Forced colours: system colours only, borders instead of fills and shadows. */
+@media (forced-colors: active) {
+  .toast, .info-mark-text, .tip-label { background: Canvas; color: CanvasText; border: 1px solid CanvasText; box-shadow: none; forced-color-adjust: auto; }
+  .toast-action, .toast-close, .info-mark-btn { color: ButtonText; border-color: ButtonText; }
+  .toast-action:focus-visible, .toast-close:focus-visible, .info-mark-btn:focus-visible,
+  :where(button, a[href], input, select, textarea, [tabindex]):focus-visible { outline: 2px solid Highlight; outline-offset: 2px; }
+  .info-mark-btn[aria-expanded="true"] { background: Highlight; color: HighlightText; }
+  * { text-shadow: none !important; }
+}

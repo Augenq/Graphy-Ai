@@ -1,0 +1,110 @@
+/* The MAX palette (Settings → Appearance): the app's own colours from lib/palette.ts, written onto the native
+   MAX tokens the provider, the menus and the portals read, so every surface follows the choice.
+   The tokens themselves are generated in max-palette-tokens.css; this file overrides them and wins by :root. */
+
+/* ---- light */
+html:root[data-palette="max"][data-theme="light"],
+html:root[data-palette="max"][data-theme="light"] .graphy-max-ui,
+html:root[data-palette="max"][data-theme="light"] .ui-menu-content {
+  --background-surface: #ffffff;
+  --background-primary: #f1f2f4;
+  --background-secondary: #e6e7ea;
+  --background-tertiary: rgb(14 14 17 / .05);
+  --background-card: #ffffff;
+  --background-surface-secondary: #e6e7ea;
+  --text-primary: #0e0e11;
+  --text-secondary: #454851;
+  --text-tertiary: #7d818c;
+  --text-themed: #0077ff;
+  --text-negative: #ff3b30;
+  --icon-primary: rgb(14 14 17 / .84);
+  --icon-tertiary: rgb(14 14 17 / .48);
+  --icon-themed: #0077ff;
+  --icon-negative: #ff3b30;
+  --divider-primary: rgb(14 14 17 / .16);
+  --divider-secondary: rgb(14 14 17 / .06);
+  --button-primary: #0077ff;
+  --button-primary-contrast: #ffffff;
+  --button-negative: #ff3b30;
+  --controls-active: #0077ff;
+  --states-button-primary-hover: #3392ff;
+  --states-button-primary-pressed: #0066dd;
+  --states-button-negative-hover: #ff554c;
+  --states-button-negative-pressed: #e02f26;
+}
+
+/* ---- dark */
+html:root[data-palette="max"][data-theme="dark"],
+html:root[data-palette="max"][data-theme="dark"] .graphy-max-ui,
+html:root[data-palette="max"][data-theme="dark"] .ui-menu-content {
+  --background-surface: #1b1b20;
+  --background-primary: #121216;
+  --background-secondary: #26262d;
+  --background-tertiary: rgb(255 255 255 / .07);
+  --background-card: #222228;
+  --background-surface-secondary: #222228;
+  --text-primary: #ffffff;
+  --text-secondary: #c6c7cd;
+  --text-tertiary: #8f909b;
+  --text-themed: #1a85ff;
+  --text-negative: #ff3b30;
+  --icon-primary: #ffffff;
+  --icon-tertiary: rgb(255 255 255 / .55);
+  --icon-themed: #1a85ff;
+  --icon-negative: #ff3b30;
+  --divider-primary: rgb(255 255 255 / .14);
+  --divider-secondary: rgb(255 255 255 / .08);
+  --button-primary: #1a85ff;
+  --button-primary-contrast: #ffffff;
+  --button-negative: #ff3b30;
+  --controls-active: #1a85ff;
+  --states-button-primary-hover: #4098ff;
+  --states-button-primary-pressed: #0f74e6;
+  --states-button-negative-hover: #ff554c;
+  --states-button-negative-pressed: #e02f26;
+}
+
+/* The palette's own roles the app keeps outside the Material roles: fields, the chosen row, hovers and the shadow. */
+html[data-palette="max"][data-theme="light"] {
+  --surface-input: #f1f2f4;
+  --surface-selected: #e5f0ff;
+  --surface-action-hover: #f3f4f6;
+  --shadow-pop: 0 2px 12px rgb(20 24 40 / .08);
+  --field-shadow: 0 2px 12px rgb(20 24 40 / .08);
+}
+html[data-palette="max"][data-theme="dark"] {
+  --surface-input: #26262d;
+  --surface-selected: #2d2d36;
+  --surface-action-hover: #26262d;
+  --shadow-pop: 0 2px 14px rgb(0 0 0 / .35);
+  --field-shadow: 0 2px 14px rgb(0 0 0 / .35);
+}
+
+/* Semantic aliases for custom UI, charts and controls outside the MAX provider. */
+html[data-palette="max"][data-theme] {
+  --focus-indicator: var(--controls-active);
+  --u-in: var(--text-themed);
+  --u-out: var(--text-attention);
+  --u-cache: var(--text-positive);
+  --u-s1: var(--text-themed);
+  --u-s2: var(--text-attention);
+  --u-s3: var(--text-positive);
+  --u-s4: var(--text-negative);
+  --u-s5: var(--text-secondary);
+  --u-s6: var(--text-tertiary);
+  --u-heat: var(--text-themed);
+  --u-line: var(--text-themed);
+}
+html[data-palette="max"][data-theme] .toast {
+  --toast-bg: var(--background-secondary);
+  --toast-fg: var(--text-primary);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html[data-palette="max"][data-theme] .toast :is(.toast-action, .toast-close) {
+  color: var(--text-themed);
+  --button-overlay: var(--background-tertiary);
+}
+html[data-palette="max"][data-theme] .toast[data-kind="error"]::before { background: var(--danger); }
+html[data-palette="max"][data-theme] .rm-svg { background: var(--sheet); }
+html[data-palette="max"][data-theme] .ui-dialog-backdrop { background: var(--background-overlay); }

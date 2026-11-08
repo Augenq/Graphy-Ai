@@ -1,0 +1,17 @@
+export default {
+  "только что": "Just now",
+  "Найденные источники": "Sources found",
+  "Шрифт ответов": "Answer font",
+  "Гарнитура текста ответов в диалоге": "Typeface of the answers in the dialog",
+  "Без засечек": "Sans",
+  "С засечками": "Serif",
+  "Анимации": "Animations",
+  "«Системные» следуют настройке устройства; «Выкл» убирает движение в интерфейсе.": "“System” follows the device setting; “Off” removes motion in the interface.",
+  "Переходы, появление текста, подсветка": "Transitions, text reveal, shimmer",
+  "Системные": "System",
+  "Выкл": "Off",
+  "Модель не принимает изображения": "This model does not accept images",
+  "Схема или макет уйдёт как картинка": "A diagram or mockup is sent as a picture",
+  "Ctrl U · картинки до 5 МБ": "Ctrl U · images up to 5 MB",
+  "Список файлов, без содержимого": "File listing, without contents",
+};

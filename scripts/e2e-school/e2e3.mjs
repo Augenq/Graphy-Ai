@@ -1,0 +1,22 @@
+import { open } from './lib.mjs';
+const log=(...a)=>console.log(...a);
+const T = await open('T'); const p = T.p;
+await p.goto('http://localhost:5191/#school', { waitUntil: 'networkidle' }); await p.waitForTimeout(2000);
+log('home:', (await p.innerText('[data-teacher-school]')).replace(/\n+/g,' | ').slice(0,360));
+await p.screenshot({ path: 't1-home.png' });
+await p.getByRole('button', { name: 'Проверить', exact: true }).click(); await p.waitForSelector('[data-tsc-detail]');
+log('stats:', (await p.innerText('[data-tsc-stats]')).replace(/\n+/g,' | '));
+log('table:', (await p.innerText('[data-tsc-results]')).replace(/\n+/g,' | '));
+await p.screenshot({ path: 't2-detail.png', fullPage: true });
+await p.click('[data-tsc-row="9002"] button'); await p.waitForSelector('[data-tsc-drill]');
+await p.screenshot({ path: 't3-drill.png', fullPage: true });
+// grade the free text (3rd answer)
+const ans = p.locator('[data-tsc-answer]').nth(2);
+await ans.getByRole('button', { name: 'Верно' }).first().click(); await p.waitForTimeout(800);
+log('verdict:', (await ans.innerText()).replace(/\n+/g,' | '));
+await p.getByRole('button', { name: '← К результатам' }).click(); await p.waitForTimeout(800);
+log('after grade:', (await p.innerText('[data-tsc-stats]')).replace(/\n+/g,' | '));
+await p.getByRole('button', { name: 'Удалить' }).click(); log('delete confirm:', await p.locator('.tsc-confirm').innerText());
+await p.getByRole('button', { name: 'Отмена' }).click();
+await p.screenshot({ path: 't4-detail2.png', fullPage: true });
+log('T errs', p.errs.filter(e=>!/models\/refresh|400 \(Bad/.test(e))); await T.b.close();

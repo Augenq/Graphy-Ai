@@ -1,0 +1,20 @@
+{
+  "name": "graphy",
+  "private": true,
+  "description": "Graphy learning web application and agent API",
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/run.mjs setup",
+    "dev": "node scripts/run.mjs dev",
+    "start": "node scripts/run.mjs start",
+    "web": "node scripts/run.mjs web",
+    "serve": "node scripts/run.mjs serve",
+    "search": "node scripts/run.mjs search",
+    "sandbox": "node scripts/run.mjs sandbox",
+    "test": "node scripts/run.mjs test",
+    "build": "node scripts/run.mjs build"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

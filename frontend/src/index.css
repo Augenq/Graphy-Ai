@@ -1,0 +1,727 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+/* A native-element reset avoids Tailwind Preflight overriding :host padding
+   and typography on Material Web custom elements. */
+@layer base {
+  :where(html, body, div, span, main, header, footer, section, article, aside, nav, button, input, textarea, select, fieldset, legend, h1, h2, h3, h4, p, ul, ol, li, table, th, td, blockquote, pre, code, kbd, a, label) {
+    box-sizing: border-box; margin: 0; padding: 0; border: 0 solid;
+  }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { background: transparent; }
+  a { color: inherit; }
+  svg { display: block; vertical-align: middle; }
+}
+/* Must be the CSS of the katex that rehype-katex renders with (0.16.x, nested): the top-level katex 0.19 CSS renamed .sizing to .katex-sizing, which broke every size-reduced node (fractions, scripts). */
+@import "../node_modules/rehype-katex/node_modules/katex/dist/katex.min.css";
+
+@font-face {
+  font-family: "Graphy Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/playfair-display-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Graphy Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/playfair-display-cyrillic-400-normal.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+.home-heading.md-typescale-headline-large, .graphy-wordmark { font-family: var(--font-display); font-weight: 400; }
+
+/* Neutral Material 3 roles are defined in material-theme.ts.
+   Custom graph/chat surfaces consume the same roles as the library's components. */
+:root {
+  /* The preferred 110% density is part of the app, independent of browser zoom. */
+  --ui-scale: 1.1;
+  --app-vw: calc(1vw / var(--ui-scale));
+  --app-vh: calc(1vh / var(--ui-scale));
+  --app-dvh: calc(1dvh / var(--ui-scale));
+  --md-ref-typeface-brand: "Roboto";
+  --md-ref-typeface-plain: "Roboto";
+  --md-icon-font: "Material Symbols Outlined";
+  --paper: var(--md-sys-color-surface);
+  --rail: var(--md-sys-color-surface-container-low);
+  --sheet: var(--md-sys-color-surface-container-lowest);
+  --wash: var(--md-sys-color-surface-container-high);
+  --rule: var(--md-sys-color-outline-variant);
+  --rule-2: var(--md-sys-color-outline);
+  --outline: var(--md-sys-color-outline-variant);
+  --control: var(--md-sys-color-outline);
+  --ink: var(--md-sys-color-on-surface);
+  --ink-2: var(--md-sys-color-on-surface-variant);
+  --ink-3: var(--md-sys-color-on-surface-variant);
+  --accent: var(--md-sys-color-primary);
+  --focus-indicator: #4877c8;
+  --md-focus-ring-color: var(--focus-indicator);
+  --warn: var(--md-sys-color-tertiary);
+  --warn-wash: var(--md-sys-color-tertiary-container);
+  --danger: var(--md-sys-color-error);
+  --bubble: var(--md-sys-color-secondary-container);
+  --plan-bg: var(--md-sys-color-surface-container);
+  --shadow-rgb: 0 0 0;
+  --course-english: var(--md-sys-color-tertiary);
+  --course-algebra: var(--md-sys-color-primary);
+  --c-canvas: var(--paper);
+  --c-ink: var(--ink);
+  --c-ink-2: var(--ink-2);
+  --c-ink-3: var(--ink-3);
+  --c-accent: var(--accent);
+  --c-course-english: var(--course-english);
+  --c-course-algebra: var(--course-algebra);
+  --sb-w: 256px;
+  --bar-h: 44px;
+  --col-max: 720px;
+  /* Type scale (logical px): 12 meta and tool lines, 14 reading and UI text, 16+ titles only.
+     Radius scale: 4 inline code, 8 controls and rows, 12 cards and bubbles, 16 composer and dialogs. */
+  --content-size: 14px;
+  --content-lh: 21px;
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+}
+/* Layout scale, control heights, UI type and surface roles. Values are logical px (the page zoom of --ui-scale applies on top).
+   Roles resolve through the palette variables set by applyMaterialTheme, so every role follows the light and the dark scheme. */
+:root {
+  --space-4: 4px; --space-8: 8px; --space-12: 12px; --space-16: 16px; --space-24: 24px; --space-32: 32px;
+  /* control heights: rows and compact buttons 28-32, toolbar controls 36, primary actions 40 (44 on phones, see mobile.css) */
+  --control-xs: 28px; --control-sm: 32px; --control-md: 36px; --control-lg: 40px; --control-touch: 44px;
+  /* UI text 14/20 (rows and buttons are 13 at the app's density); notes 12-13/16-18; reading text is --content-size */
+  --fs-ui: 14px; --lh-ui: 20px; --fs-aux: 13px; --lh-aux: 18px; --fs-meta: 12px; --lh-meta: 16px;
+  --font-display: "Roboto", sans-serif;
+  --display-size: 36px; --display-lh: 44px; --display-tracking: -0.025em;
+  --logo-accent: #0d85ff;
+  /* Sizes below are CSS px; on a desktop the page zoom --ui-scale (1.1) makes them 10% larger on screen, a phone has 1.
+     Targets of the design are on-screen px: heading 40/48 (36/44 here), column ~748 (680 here). */
+  /* the working column of the first screen: heading, input and «Continue» share it */
+  --home-w: 680px;
+  /* legacy names, now aliases of the shared tokens in styles/motion.css */
+  --ease-ui: var(--ease-out-quint);
+  --dur-hover: var(--dur-fast);
+  /* surface roles: page, navigation, input, open menu, selected row, standalone action */
+  --surface-page: var(--paper);
+  --surface-sidebar: var(--rail);
+  --surface-input: var(--sheet);
+  --surface-tray: color-mix(in srgb, var(--ink) 5%, var(--paper));
+  --field-ring: 0 0 0 1px rgb(20 20 20 / 0.15);
+  --field-ring-focus: 0 0 0 1px rgb(20 20 20 / 0.3);
+  --field-shadow: 0 1px 2px rgb(15 15 15 / 0.05), 0 4px 10px -5px rgb(15 15 15 / 0.12);
+  --tray-ring: inset 0 0 0 1px rgb(20 20 20 / 0.06);
+  --panel-r: 20px;
+  --surface-menu: var(--sheet);
+  --surface-selected: color-mix(in srgb, var(--ink) 8%, transparent);
+  --surface-action: var(--sheet);
+  --surface-action-hover: color-mix(in srgb, var(--ink) 4%, var(--sheet));
+}
+html[data-theme="dark"] {
+  --logo-accent: #0d85ff;
+  --surface-input: var(--wash);
+  --surface-tray: color-mix(in srgb, var(--ink) 4%, var(--paper));
+  --field-ring: 0 0 0 1px rgb(255 255 255 / 0.13);
+  --field-ring-focus: 0 0 0 1px rgb(255 255 255 / 0.28);
+  --field-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 6px 14px -6px rgb(0 0 0 / 0.55);
+  --tray-ring: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+}
+@media (max-width: 875px) { :root { --display-size: 34px; --display-lh: 42px; } }
+html[data-textsize="s"] { --content-size: 13px; --content-lh: 19px; }
+html[data-textsize="l"] { --content-size: 16px; --content-lh: 24px; }
+html[data-width="narrow"] { --col-max: 672px; }
+html[data-width="wide"] { --col-max: 864px; }
+@theme inline {
+  --font-sans: "Roboto", sans-serif;
+  --font-logo: "Roboto", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --color-paper: var(--paper);
+  --color-rail: var(--rail);
+  --color-sheet: var(--sheet);
+  --color-wash: var(--wash);
+  --color-rule: var(--rule);
+  --color-rule-2: var(--rule-2);
+  --color-outline: var(--outline);
+  --color-control: var(--control);
+  --color-bubble: var(--bubble);
+  --color-plan: var(--plan-bg);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-accent-ui: var(--accent);
+  --color-warn-ui: var(--warn);
+  --color-warn-wash: var(--warn-wash);
+  --color-danger-ui: var(--danger);
+  --text-xs: var(--md-sys-typescale-label-medium-size, 12px);
+  --text-xs--line-height: var(--md-sys-typescale-label-medium-line-height, 16px);
+  --text-sm: var(--md-sys-typescale-body-small-size, 12px);
+  --text-sm--line-height: var(--md-sys-typescale-body-small-line-height, 16px);
+  --text-base: var(--md-sys-typescale-body-medium-size, 14px);
+  --text-base--line-height: var(--md-sys-typescale-body-medium-line-height, 20px);
+  --text-md: var(--md-sys-typescale-body-large-size, 16px);
+  --text-md--line-height: var(--md-sys-typescale-body-large-line-height, 24px);
+  --text-content: var(--content-size);
+  --text-content--line-height: var(--content-lh);
+  --text-lg: 16px;
+  --text-lg--line-height: 24px;
+  --text-xl: var(--md-sys-typescale-title-large-size, 22px);
+  --text-xl--line-height: 28px;
+  --text-2xl: var(--md-sys-typescale-headline-small-size, 24px);
+  --text-2xl--line-height: 32px;
+  --text-3xl: var(--md-sys-typescale-headline-medium-size, 28px);
+  --text-3xl--line-height: 36px;
+  --text-display: var(--md-sys-typescale-headline-large-size, 32px);
+  --text-display--line-height: 40px;
+  --radius-control: var(--r-md);
+  --radius-sheet: var(--r-lg);
+  --shadow-pop: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px rgb(0 0 0 / 0.3);
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+}
+html, body, #root { height: 100%; margin: 0; color: var(--ink); font-family: "Roboto", sans-serif; font-size: 14px; -webkit-font-smoothing: antialiased; overflow: hidden; }
+html { font-size: 16px; zoom: var(--ui-scale); }
+html, body { background: var(--surface-page); }
+button, nav, aside, header, .chrome { user-select: none; }
+textarea, input, .selectable { user-select: text; }
+::selection { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+.scroll-x { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+.material-button { flex-shrink: 0; }
+.material-icon-button { flex-shrink: 0; }
+md-icon { flex-shrink: 0; --md-icon-font: "Material Symbols Outlined"; }
+md-outlined-text-field, md-filled-text-field { min-width: 0; }
+.material-field { display: block; width: 100%; }
+.material-disclosure { position: relative; }
+.material-disclosure:focus-visible, a:focus-visible { outline: 3px solid var(--focus-indicator); outline-offset: 2px; }
+md-list { background: transparent; }
+md-list-item { border-radius: 8px; }
+/* Material moves ARIA attributes off its host: the current row carries data-aria-current, not aria-current (checked in the rendered DOM) */
+md-list-item:is([aria-current="page"], [data-aria-current="page"]) { --md-list-item-container-color: var(--md-sys-color-secondary-container); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+nav[data-sidebar] md-list-item:is([aria-current="page"], [data-aria-current="page"]) { --md-list-item-container-color: var(--surface-selected); background: var(--surface-selected); }
+.graphy-workspace { background: var(--md-sys-color-surface-container-low); }
+.graphy-canvas { overflow: clip; /* not scrollable: focusing a form field must not slide the header */ background: var(--surface-page); }
+/* the sidebar is its own surface role (a step off the page), the hairline separates it */
+nav[data-sidebar] { background: var(--surface-sidebar); border-right: 1px solid var(--rule); }
+.graphy-dialog { max-width: calc(calc(100 * var(--app-vw)) - 32px); max-height: calc(calc(100 * var(--app-dvh)) - 32px); }
+.graphy-dialog::part(content) { padding: 0; }
+.graphy-dialog-content { padding: 0; overflow: hidden; max-height: calc(calc(100 * var(--app-dvh)) - 80px); }
+.graphy-dialog-content > div { max-height: inherit; }
+.tip { position: relative; display: inline-flex; align-items: center; }
+.tip-label { pointer-events: none; position: absolute; z-index: 90; top: calc(100% + 8px); left: 50%; width: max-content; max-width: 280px; padding: 6px 10px; border-radius: 4px; background: var(--md-sys-color-inverse-surface); color: var(--md-sys-color-inverse-on-surface); font: 400 12px/16px "Roboto"; opacity: 0; transform: translateX(-50%) scale(.98); transition: opacity var(--dur-fast) var(--ease-out-quint), transform var(--dur-fast) var(--ease-out-quint); }
+.tip:is(:hover,:focus-within) .tip-label { opacity: 1; transform: translateX(-50%) scale(1); transition-delay: 315ms; }
+@media (max-width: 875px) {
+  .question-actions { flex-wrap: wrap; }
+}
+
+/* ---------------------------------------------------------------- motion
+   Only opacity/transform; everything stops for reduced motion. */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-left {
+  from { transform: translateX(-24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes slide-right {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+
+/* Working state, as in Cursor: muted text with a light band sweeping across it. */
+/* A fixed-width tile of light repeats along the text, so the speed is the same for «Читает» and for a long
+   line and the loop is seamless: one tile per cycle, 1 s. Only the paint of the glyphs changes: no layout,
+   no width change, no React render. The class is the whole switch: remove it and the text is plain again. */
+@keyframes shimmer {
+  from { background-position: 0 0; }
+  to { background-position: 200px 0; }
+}
+.shimmer-text, .trace-verb.shimmer-text {
+  color: transparent;
+  --shimmer-base: color-mix(in srgb, var(--ink-3) 65%, transparent);
+  background: linear-gradient(90deg, var(--shimmer-base) 0%, var(--shimmer-base) 36%, var(--ink) 50%, var(--shimmer-base) 64%, var(--shimmer-base) 100%) 0 0 / 200px 100% repeat-x;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 1s linear infinite;
+}
+/* the silent-gap row at the end of the transcript: it appears only if the gap lasts, so quick hand-offs between steps never flash it */
+.live-row { animation: fade 160ms ease-out 240ms both; }
+.rise { animation: rise 160ms var(--ease-out) both; }
+.fade-in { animation: fade 160ms ease-out both; }
+.slide-left { animation: slide-left 200ms var(--ease-out) both; }
+.slide-right { animation: slide-right 200ms var(--ease-out) both; }
+/* transcript blocks that were already there when the lesson opened */
+[data-instant] .rise, [data-instant] .fade-in { animation: none; }
+
+@media (forced-colors: active) {
+  .shimmer-text, .trace-verb.shimmer-text { color: CanvasText; background: none; animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text, .trace-verb.shimmer-text { color: var(--ink-2); background: none; animation: none; }
+  .live-row { animation-duration: 0.01ms; }
+  .rise, .fade-in, .slide-left, .slide-right { animation: none; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ------------------------------------------------- reading content (.md)
+   Everything is system-ui. Learning text 16/26; headings 600. */
+.md {
+  font-family: var(--font-sans);
+  font-size: var(--content-size);
+  line-height: var(--content-lh);
+  letter-spacing: 0.002em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 12px; }
+.md h1, .md h2, .md h3, .md h4 {
+  font-weight: 500;
+  margin: 20px 0 4px;
+  letter-spacing: -0.01em;
+}
+.md h1 { font-size: 1.43em; line-height: 1.43; margin-top: 24px; }
+.md h2 { font-size: 1.21em; line-height: 1.43; margin-top: 20px; margin-bottom: 4px; }
+.md h3 { font-size: 1.07em; line-height: 1.43; letter-spacing: 0; }
+.md h4 { font-size: 1em; line-height: inherit; letter-spacing: 0; color: var(--ink-2); }
+.md ul, .md ol { margin: 0 0 12px; padding-left: 1.4em; }
+.md li { margin: 2px 0; }
+.md li > p { margin: 0; }
+.md strong { font-weight: 700; }
+.md a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--control); }
+.md a:hover { text-decoration-color: var(--ink); }
+.md blockquote {
+  margin: 0 0 12px;
+  padding: 2px 0 2px 16px;
+  border-left: 1px solid var(--rule-2);
+  color: var(--ink-2);
+}
+.md hr { border: 0; border-top: 1px solid var(--rule); margin: 24px 0; }
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  background: var(--wash);
+  border-radius: var(--r-sm);
+  padding: 1px 5px;
+}
+.md pre {
+  margin: 0;
+  padding: 12px 16px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  background: var(--wash);
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+}
+.md pre code { background: none; padding: 0; font-size: inherit; }
+.md table { border-collapse: collapse; font-size: 13px; line-height: 18px; min-width: 100%; }
+.md th, .md td { border-bottom: 1px solid var(--rule); padding: 8px 12px; text-align: left; vertical-align: top; }
+.md th { font-weight: 500; border-bottom-color: var(--rule-2); }
+.md .katex { font-size: 1.06em; }
+.md .katex-display { margin: 14px 0; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+
+/* compact variant for prompts and options inside forms */
+.md.md-ui {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: 0;
+}
+.md.md-ui p { margin: 0; }
+[data-material-disclosure] { position: relative; font-family: "Roboto", sans-serif; }
+[data-material-disclosure]:focus-visible { outline: 3px solid var(--focus-indicator); outline-offset: 2px; }
+
+/* Dialog geometry is independent of the dialog's content («settings» size: the skill editor; Settings itself is a page, styles/settings-page.css). */
+.graphy-dialog { width: min(560px, calc(calc(100 * var(--app-vw)) - 32px)); max-width: calc(calc(100 * var(--app-vw)) - 32px); max-height: calc(calc(100 * var(--app-dvh)) - 48px); }
+.graphy-dialog-content { width: 100%; max-height: none; padding: 0; overflow: auto; }
+.dialog-search { width: min(800px, calc(calc(100 * var(--app-vw)) - 32px)); height: min(600px, calc(calc(100 * var(--app-dvh)) - 80px)); }
+.dialog-settings { width: min(960px, calc(calc(100 * var(--app-vw)) - 32px)); height: min(680px, calc(calc(100 * var(--app-dvh)) - 48px)); }
+.dialog-top { margin-top: max(24px, calc(8 * var(--app-dvh))); }
+.dialog-settings .graphy-dialog-content { height: min(680px, calc(calc(100 * var(--app-dvh)) - 48px)); min-height: 0; overflow: hidden; }
+.dialog-search .graphy-dialog-content { height: min(600px, calc(calc(100 * var(--app-dvh)) - 80px)); min-height: 0; overflow: hidden; }
+.search-dialog-layout { display: flex; flex-direction: column; }
+
+/* All sidebar rows use the same full-width alignment. */
+nav[data-sidebar] md-list { width: 100%; }
+nav[data-sidebar] md-list-item { width: 100%; gap: 10px; --md-list-item-top-space: 0px; --md-list-item-bottom-space: 0px; }
+.sidebar-session-meta { display: flex; gap: 8px; align-items: center; white-space: nowrap; font: 400 12px/16px "Roboto"; color: var(--ink-3); }
+.sidebar-session-meta md-icon { --md-icon-size: 18px; }
+.sidebar-delete { --md-icon-button-icon-size: 16px; width: 28px; height: 28px; margin: -6px 0; }
+/* the «…» button is folded away until the row is hovered or focused: then it opens on the right and pushes the time and state left */
+.row-menu { display: inline-flex; width: 0; margin-left: -8px; opacity: 0; overflow: hidden; transition: width var(--dur-normal) var(--ease-out-quint), margin-left var(--dur-normal) var(--ease-out-quint), opacity var(--dur-fast) linear; }
+md-list-item:hover .row-menu, md-list-item:focus-within .row-menu, .row-menu:has([aria-expanded="true"]) { width: 28px; margin-left: 0; opacity: 1; }
+@media (hover: none) { .row-menu { width: 28px; margin-left: 0; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .row-menu { transition: none; } }
+
+/* Quiet rounded searches: no changes on hover, focus or pointer press. */
+.search-field, .borderless-input {
+  --md-filled-text-field-active-indicator-height: 0px;
+  --md-filled-text-field-hover-active-indicator-height: 0px;
+  --md-filled-text-field-focus-active-indicator-height: 0px;
+  --md-filled-text-field-disabled-active-indicator-height: 0px;
+  --md-filled-text-field-hover-state-layer-opacity: 0;
+  --md-filled-text-field-container-shape: 24px;
+}
+.search-field {
+  --md-filled-text-field-container-color: var(--md-sys-color-surface-container-high);
+  --md-filled-text-field-top-space: 8px;
+  --md-filled-text-field-bottom-space: 8px;
+  --md-filled-text-field-input-text-size: 14px;
+  --md-filled-text-field-input-text-line-height: 24px;
+  --md-filled-text-field-hover-input-text-color: var(--ink);
+  --md-filled-text-field-focus-input-text-color: var(--ink);
+  flex-shrink: 0;
+}
+.chat-input { width: 100%; resize: none; --md-filled-text-field-container-color: var(--md-sys-color-surface-container-high); --md-filled-text-field-input-text-size: var(--content-size); --md-filled-text-field-input-text-line-height: var(--content-lh); --md-filled-text-field-top-space: 4px; --md-filled-text-field-bottom-space: 4px; --md-filled-text-field-leading-space: 4px; --md-filled-text-field-trailing-space: 4px; }
+.composer-toolbar { display: flex; align-items: center; gap: 4px; min-height: 40px; }
+.style-label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 480px) { .style-label { max-width: 70px; } }
+.style-button { flex-shrink: 0; }
+.reasoning-button { flex-shrink: 0; }
+.agent-status { min-height: 24px; }
+.agent-status-indicator { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 14px; height: 14px; min-width: 14px; overflow: visible; line-height: 0; }
+.agent-status-indicator .working-indicator, .agent-status-indicator .working-progress { width: 12px; height: 12px; min-width: 12px; max-width: 12px; max-height: 12px; }
+.composer-waiting { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: min(var(--col-max), 100%); box-sizing: border-box; margin-inline: auto; padding: 4px 24px 8px; flex-shrink: 0; }
+.composer-waiting .agent-status { flex: 1; }
+.jump-to-latest { position: absolute; z-index: 5; bottom: 12px; left: 50%; transform: translateX(-50%); display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--rule-2); border-radius: 50%; background: var(--sheet); color: var(--ink-2); cursor: default; box-shadow: 0 2px 6px rgb(0 0 0 / 0.12); transition: color var(--dur-fast) var(--ease-default); }
+.jump-to-latest:hover { color: var(--ink); }
+.jump-to-latest:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+.copy-action { flex-shrink: 0; }
+
+.palette-search-bar { display: flex; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.palette-search { flex: 1; min-width: 0; --md-filled-text-field-top-space: 12px; --md-filled-text-field-bottom-space: 12px; --md-filled-text-field-input-text-size: 16px; }
+.palette-results { list-style: none; margin: 0; padding: 8px 12px; flex: 1; min-height: 0; overflow-x: hidden; }
+.search-result { display: flex; align-items: center; gap: 16px; padding: 12px 16px; min-height: 64px; border-radius: 16px; cursor: pointer; }
+.search-result.keyboard-selected { background: var(--wash); }
+.palette-footer { display: flex; align-items: center; gap: 12px; padding: 12px 24px; border-top: 1px solid var(--rule); flex-shrink: 0; }
+md-circular-progress { --md-circular-progress-size: 24px; flex-shrink: 0; }
+@media (max-width: 875px) {
+  .composer-waiting { padding-inline: 16px; }
+  .composer-toolbar { flex-wrap: wrap; }
+}
+
+/* One input panel for the lesson composer and the home goal (see components/ComposerPanel.tsx and styles/composer.css). */
+/* a disabled field stays part of the panel instead of becoming a darker box inside it */
+.composer-surface .chat-input { --md-filled-text-field-disabled-container-color: transparent; --md-filled-text-field-disabled-container-opacity: 1; --md-filled-text-field-disabled-input-text-opacity: 0.6; }
+.composer-surface .chat-input { --md-filled-text-field-container-color: transparent; }
+
+
+/* A modest density reduction across the shared Material controls. */
+:root {
+  --md-filled-button-container-height: 28px;
+  --md-filled-tonal-button-container-height: 28px;
+  --md-outlined-button-container-height: 28px;
+  --md-text-button-container-height: 28px;
+  --md-elevated-button-container-height: 28px;
+  --md-filled-button-label-text-size: 12px;
+  --md-filled-tonal-button-label-text-size: 12px;
+  --md-outlined-button-label-text-size: 12px;
+  --md-text-button-label-text-size: 12px;
+  --md-filled-button-leading-space: 14px;
+  --md-filled-button-trailing-space: 14px;
+  --md-outlined-button-leading-space: 14px;
+  --md-outlined-button-trailing-space: 14px;
+  --md-text-button-leading-space: 8px;
+  --md-text-button-trailing-space: 8px;
+  --md-icon-size: 16px;
+  --md-icon-button-icon-size: 16px;
+  --md-icon-button-state-layer-height: 28px;
+  --md-icon-button-state-layer-width: 28px;
+  --md-filled-icon-button-icon-size: 16px;
+  --md-filled-icon-button-container-height: 28px;
+  --md-filled-icon-button-container-width: 28px;
+  --md-filled-tonal-icon-button-icon-size: 16px;
+  --md-filled-tonal-icon-button-container-height: 28px;
+  --md-filled-tonal-icon-button-container-width: 28px;
+  --md-outlined-icon-button-icon-size: 16px;
+  --md-outlined-icon-button-container-height: 28px;
+  --md-outlined-icon-button-container-width: 28px;
+  --md-filter-chip-container-height: 24px;
+  --md-assist-chip-container-height: 24px;
+  --md-input-chip-container-height: 24px;
+  --md-filter-chip-label-text-size: 13px;
+  --md-assist-chip-label-text-size: 13px;
+  --md-input-chip-label-text-size: 13px;
+  --md-secondary-tab-label-text-size: 13px;
+  --md-list-item-leading-icon-size: 16px;
+  --md-list-item-label-text-size: 13px;
+  --md-list-item-label-text-line-height: 20px;
+}
+nav[data-sidebar] md-list-item { height: var(--control-sm); --md-list-item-one-line-container-height: var(--control-sm); }
+.search-field { --md-filled-text-field-top-space: 6px; --md-filled-text-field-bottom-space: 6px; --md-filled-text-field-input-text-line-height: 20px; }
+.palette-search { --md-filled-text-field-top-space: 8px; --md-filled-text-field-bottom-space: 8px; --md-filled-text-field-input-text-size: 14px; }
+.composer-toolbar { min-height: 28px; }
+.search-result { min-height: 48px; padding: 8px 12px; gap: 12px; }
+
+.working-progress { --md-circular-progress-size: 14px; }
+
+/* No pointer-press feedback. Hover and keyboard focus remain available. */
+:root {
+  --md-assist-chip-pressed-state-layer-opacity: 0;
+  --md-checkbox-pressed-state-layer-opacity: 0;
+  --md-checkbox-selected-pressed-state-layer-opacity: 0;
+  --md-elevated-button-pressed-state-layer-opacity: 0;
+  --md-fab-branded-pressed-state-layer-opacity: 0;
+  --md-fab-pressed-state-layer-opacity: 0;
+  --md-filled-button-pressed-state-layer-opacity: 0;
+  --md-filled-icon-button-pressed-state-layer-opacity: 0;
+  --md-filled-tonal-button-pressed-state-layer-opacity: 0;
+  --md-filled-tonal-icon-button-pressed-state-layer-opacity: 0;
+  --md-filter-chip-pressed-state-layer-opacity: 0;
+  --md-filter-chip-selected-pressed-state-layer-opacity: 0;
+  --md-icon-button-pressed-state-layer-opacity: 0;
+  --md-icon-button-selected-pressed-state-layer-opacity: 0;
+  --md-input-chip-pressed-state-layer-opacity: 0;
+  --md-input-chip-selected-pressed-state-layer-opacity: 0;
+  --md-list-item-pressed-state-layer-opacity: 0;
+  --md-menu-item-pressed-state-layer-opacity: 0;
+  --md-navigation-bar-pressed-state-layer-opacity: 0;
+  --md-outlined-button-pressed-state-layer-opacity: 0;
+  --md-outlined-icon-button-pressed-state-layer-opacity: 0;
+  --md-outlined-segmented-button-pressed-state-layer-opacity: 0;
+  --md-primary-tab-active-pressed-state-layer-opacity: 0;
+  --md-primary-tab-pressed-state-layer-opacity: 0;
+  --md-radio-pressed-state-layer-opacity: 0;
+  --md-radio-selected-pressed-state-layer-opacity: 0;
+  --md-secondary-tab-active-pressed-state-layer-opacity: 0;
+  --md-secondary-tab-pressed-state-layer-opacity: 0;
+  --md-slider-pressed-state-layer-opacity: 0;
+  --md-suggestion-chip-pressed-state-layer-opacity: 0;
+  --md-switch-pressed-state-layer-opacity: 0;
+  --md-switch-selected-pressed-state-layer-opacity: 0;
+  --md-text-button-pressed-state-layer-opacity: 0;
+  --md-ripple-pressed-opacity: 0;
+}
+md-ripple { --md-ripple-pressed-opacity: 0; }
+.sidebar-session-meta md-circular-progress { --md-circular-progress-size: 20px; }
+
+.plan-popover { max-height: min(calc(65 * var(--app-dvh)), 560px); overflow: auto; }
+@media (max-width: 875px) {
+  .plan-popover { position: fixed; inset: 52px 16px auto; width: auto; margin-top: 0; }
+}
+
+/* Desktop density matched to the supplied compact app references. */
+:root {
+  --md-dialog-container-shape: 16px;
+  --md-list-item-one-line-container-height: 36px;
+  --md-list-item-two-line-container-height: 52px;
+  --md-list-item-top-space: 4px;
+  --md-list-item-bottom-space: 4px;
+  --md-list-item-leading-space: 10px;
+  --md-list-item-trailing-space: 10px;
+  --md-secondary-tab-container-height: 32px;
+  --md-radio-icon-size: 18px;
+  --md-radio-state-layer-size: 28px;
+  --md-checkbox-container-size: 16px;
+  --md-checkbox-icon-size: 16px;
+  --md-checkbox-state-layer-size: 28px;
+  --md-switch-track-width: 36px;
+  --md-switch-track-height: 22px;
+  --md-switch-handle-width: 12px;
+  --md-switch-handle-height: 12px;
+  --md-switch-selected-handle-width: 16px;
+  --md-switch-selected-handle-height: 16px;
+  --md-switch-pressed-handle-width: 16px;
+  --md-switch-pressed-handle-height: 16px;
+  --md-switch-state-layer-size: 28px;
+  --md-switch-touch-target-size: 32px;
+}
+.home-heading.md-typescale-headline-large { font-size: var(--display-size); line-height: var(--display-lh); letter-spacing: var(--display-tracking); }
+.graphy-wordmark { font-size: 24px; line-height: 28px; }
+md-outlined-text-field {
+  --md-outlined-text-field-input-text-size: 14px;
+  --md-outlined-text-field-input-text-line-height: 20px;
+  --md-outlined-text-field-label-text-size: 14px;
+  --md-outlined-text-field-top-space: 8px;
+  --md-outlined-text-field-bottom-space: 8px;
+  --md-outlined-text-field-leading-space: 12px;
+  --md-outlined-text-field-trailing-space: 12px;
+}
+md-list-item > [slot="start"], md-list-item > [slot="end"] { display: inline-flex; align-items: center; line-height: 1; }
+nav[data-sidebar] md-list { padding-block: 4px; }
+.app-topbar-title { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font: 500 18px/24px var(--font-sans); }
+.app-topbar .no-drag + .app-topbar-title { margin-left: 8px; }
+.palette-footer { padding: 8px 16px; }
+
+/* The panel enters the desktop layout and moves the entire conversation with it. */
+.question-step { border-radius: 50%; --md-outlined-icon-button-container-shape: 50%; --md-outlined-icon-button-icon-size: 13px; font: 500 13px/1 var(--md-ref-typeface-plain); }
+.question-step[data-answer-state="answered"], .question-step[data-answer-state="dont_know"], .question-step[data-answer-state="skipped"] { background: var(--wash); }
+.question-step[data-answer-state="skipped"] { --md-outlined-icon-button-outline-color: var(--c-ink-3); }
+.question-step.is-current { background: var(--c-ink); --md-outlined-icon-button-icon-color: var(--paper); --md-outlined-icon-button-hover-icon-color: var(--paper); --md-outlined-icon-button-focus-icon-color: var(--paper); }
+/* Course colors are confined to the knowledge map; application themes stay neutral. */
+
+/* ------------------------------------------------ trace lines (Cursor style)
+   Reasoning and tool calls are plain muted lines: no icons, no cards, no rules.
+   Verb is the brighter word, the subject and result are dimmer, the chevron
+   appears on hover or while the line is open. Details open as a quiet block. */
+.trace { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-height: 24px; padding: 0; border: 0; background: none; color: var(--ink-3); font: 400 var(--content-size)/var(--content-lh) var(--font-sans); text-align: left; cursor: default; }
+.trace:disabled { cursor: default; }
+.trace:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; border-radius: var(--r-sm); }
+.trace-verb { flex-shrink: 0; white-space: nowrap; color: var(--ink-2); transition: color var(--dur-fast) var(--ease-default); }
+.trace-subject { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trace-icon { flex-shrink: 0; font-size: 16px; width: 16px; height: 16px; color: var(--ink-3); }
+.trace-progress { margin: 0 0 2px 22px; color: var(--ink-3); font: 400 var(--content-size)/var(--content-lh) var(--font-sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trace-result { flex-shrink: 0; white-space: nowrap; opacity: 0.8; }
+.trace-chev { flex-shrink: 0; width: 12px; height: 12px; opacity: 0; transition: opacity var(--dur-fast) var(--ease-default), transform var(--dur-normal) var(--ease-default); }
+.trace:not(:disabled):is(:hover, :focus-visible) .trace-chev, .trace[aria-expanded="true"] .trace-chev { opacity: 1; }
+.trace[aria-expanded="true"] .trace-chev { transform: rotate(90deg); }
+.trace:not(:disabled):hover .trace-verb { color: var(--ink); }
+.trace[data-tone="fail"], .trace[data-tone="fail"] .trace-verb { color: var(--warn); }
+.trace[data-tone="ask"] .trace-verb { color: var(--ink); }
+.trace-list { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-top: 2px; max-width: 100%; }
+/* rows never grow past the column: long subjects are cut with an ellipsis, details wrap */
+.trace-list > *, .trace-list .trace-body { max-width: 100%; min-width: 0; }
+.trace-body { overflow-wrap: anywhere; }
+.trace-body { margin: 4px 0 8px; padding: 8px 12px; max-height: 288px; overflow: auto; overscroll-behavior: contain; border-radius: var(--r-md); background: var(--wash); color: var(--ink-3); font: 400 var(--content-size)/var(--content-lh) var(--font-mono); scrollbar-width: thin; scrollbar-color: var(--rule-2) transparent; }
+.trace-body.is-prose { margin: 2px 0 6px; padding: 0; background: none; font-family: var(--font-sans); }
+.trace-body.is-prose p { margin: 0; white-space: pre-wrap; }
+.trace-body.is-prose p + p { margin-top: 6px; }
+
+/* ---------------------------------------------------------------- sidebar
+   Quiet: no dividers, shortcut hints only while a row is hovered or focused. */
+nav[data-sidebar] md-divider { display: none; }
+nav[data-sidebar] kbd { font: 400 11px/16px var(--font-sans); opacity: 0; transition: opacity var(--dur-fast) var(--ease-default); }
+nav[data-sidebar] :is(md-list-item, .new-lesson):is(:hover, :focus-visible) kbd { opacity: 1; }
+
+/* brand: the mark stands next to the wordmark and takes its color */
+.sidebar-logo { display: inline-flex; align-items: center; gap: var(--space-8); min-width: 0; color: var(--ink); }
+.sidebar-logo .graphy-mark { flex: none; color: var(--logo-accent); }
+
+/* «New lesson»: the size, paddings and font of a sidebar row (32px, 10px sides, 13px regular) as before the redesign; the radius of the rows (8px), no shadow, a thin 1px border */
+.new-lesson { display: flex; align-items: center; flex-shrink: 0; gap: 10px; width: 100%; height: 32px; margin: 0; padding: 0 10px;
+  box-sizing: border-box; border: 0; border-radius: 8px; background: var(--surface-action); color: var(--ink); font: 400 var(--md-list-item-label-text-size, 13px)/20px var(--font-sans); text-align: left; cursor: default; box-shadow: none;
+  transition: transform var(--dur-fast) var(--ease-out-quint), background-color var(--dur-fast) var(--ease-default); }
+.new-lesson:hover { background: var(--surface-action-hover); box-shadow: none; }
+.new-lesson:active { background: var(--surface-action-hover); box-shadow: none; }
+.new-lesson:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+.new-lesson-icon { flex: none; width: 16px; height: 16px; }
+.new-lesson-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.new-lesson kbd { margin-left: auto; color: var(--ink-3); }
+nav[data-sidebar] h2 { font: 500 12px/16px var(--font-sans); letter-spacing: 0; }
+
+
+/* ------------------------------------------------------------ dropdowns
+   The trigger is a 28px control like the buttons; the menu is compact and sits exactly under it.
+   Material's menu is placed with viewport coordinates, which the page-wide `zoom` would apply twice, so the menu
+   is un-zoomed and its items are zoomed back: the popup lands under its trigger and keeps the app's density. */
+.select-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 112px; height: 28px; padding: 0 8px 0 10px; border: 1px solid var(--rule-2); border-radius: var(--r-md); background: transparent; color: var(--ink); font: 400 13px/20px var(--font-sans); text-align: left; cursor: default; transition: background-color 100ms, border-color 100ms; }
+.select-trigger:hover { background: var(--wash); }
+.select-trigger[aria-expanded="true"] { border-color: var(--control); }
+.select-trigger:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+md-menu {
+  zoom: calc(1 / var(--ui-scale));
+  max-width: 320px; /* a long name is cut with an ellipsis (.menu-label) instead of stretching the menu */
+  --md-menu-container-color: var(--surface-menu);
+  --md-menu-container-shape: var(--r-md);
+  --md-menu-container-elevation: 0; /* flat: no shadow, the 1px edge in Menu.tsx separates it from the page */
+}
+md-menu-item {
+  zoom: var(--ui-scale);
+  --md-menu-item-label-text-size: 13px;
+  --md-menu-item-label-text-line-height: 20px;
+  --md-menu-item-supporting-text-size: 12px;
+  --md-menu-item-supporting-text-line-height: 16px;
+  --md-menu-item-one-line-container-height: 32px;
+  --md-menu-item-top-space: 6px;
+  --md-menu-item-bottom-space: 6px;
+  --md-menu-item-leading-space: 10px;
+  --md-menu-item-trailing-space: 10px;
+  --md-menu-item-container-shape: var(--r-md);
+}
+
+/* ----------------------------------------------- the goal field on the home screen
+   Taller than the lesson composer: two lines of text, a toolbar with «+», the model and the round send / mic button. */
+/* One column for the whole first screen: the heading with the mark, the input and «Continue» share the same axis and width. */
+.home-screen { position: relative; isolation: isolate; }
+/* The grid is a pre-rendered layer that only slides (transform = compositor, no repaint); the soft edge is a static overlay in the page colour
+   (same result as the old radial mask over the grid, and the mask no longer re-rasterizes every frame).
+   The wrapper clips the one extra tile the layer needs, so it never adds scrollable overflow to the screen. */
+.home-grid { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: clip; contain: strict; }
+.home-grid::before, .home-grid::after { content: ""; position: absolute; top: 0; bottom: 0; }
+.home-grid::before {
+  left: -40px;
+  right: 0;
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--ink) 20%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 20%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: calc(50% + 20px) center; /* same phase as the former centred grid */
+  will-change: transform;
+}
+.home-grid::after {
+  left: 0;
+  right: 0;
+  background: radial-gradient(ellipse 58% 45% at center, transparent 15%, var(--surface-page) 100%);
+}
+@media (min-width: 601px) and (prefers-reduced-motion: no-preference) {
+  .home-grid::before { animation: home-grid-drift 6s linear infinite; }
+  html[data-home-paused] .home-grid::before { animation-play-state: paused; } /* Home is not what the user sees: Settings, a dialog, a hidden tab */
+}
+@keyframes home-grid-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(40px); }
+}
+.home-content { width: min(calc(var(--home-w) + 2 * var(--space-24)), 100%); padding: var(--space-32) var(--space-24); }
+@media (max-width: 873.75px) { .home-content { padding-inline: var(--space-16); } }
+.home-hero { display: flex; align-items: center; justify-content: center; gap: var(--space-12); margin-bottom: var(--space-32); }
+.home-mark { flex: none; color: var(--logo-accent); transform: translateY(2px); } /* the tail hangs below the baseline: the circle sits on the x-height of the heading */
+.home-heading { min-width: 0; margin: 0; text-align: center; text-wrap: balance; }
+.home-resume { margin-top: var(--space-32); }
+.home-resume-title { margin: 0 0 var(--space-8); padding-inline: var(--space-16); color: var(--ink-2); } /* 12 panel padding + 4 field padding: the label starts where the typed text starts */
+.home-composer .chat-input {
+  --md-filled-text-field-input-text-size: 16px;
+  --md-filled-text-field-input-text-line-height: 24px;
+}
+
+/* «Model ⌄»: quiet text control in the input's toolbar */
+.quiet-trigger { display: inline-flex; align-items: center; gap: 4px; max-width: 180px; height: 28px; padding: 0 8px; border: 0; border-radius: var(--r-md); background: none; color: var(--ink-3); font: 400 13px/20px var(--font-sans); cursor: default; transition: background-color 100ms, color 100ms; }
+.quiet-trigger:hover, .quiet-trigger[aria-expanded="true"] { background: var(--wash); color: var(--ink); }
+.quiet-trigger:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+
+/* send and voice: see styles/composer.css */
+@media (prefers-reduced-motion: no-preference) {
+  .voice-button[data-listening] { animation: listening 1.4s ease-in-out infinite; }
+}
+@keyframes listening {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(128 128 128 / 0.45); }
+  50% { box-shadow: 0 0 0 6px rgb(128 128 128 / 0); }
+}
+
+/* search box at the top of a menu (the model list): stays in view while the list scrolls */
+.menu-search { position: sticky; top: 0; z-index: 1; zoom: var(--ui-scale); display: flex; align-items: center; gap: 8px; padding: 10px 12px; min-height: 40px; box-sizing: border-box; background: var(--sheet); border-bottom: 1px solid var(--rule); }
+.menu-search input { flex: 1; min-width: 0; min-height: 20px; padding: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: 400 14px/20px var(--font-sans); }
+.menu-search input::placeholder { color: var(--ink-3); }
+.menu-title { zoom: var(--ui-scale); padding: 8px 10px 4px; color: var(--ink-3); font: 400 12px/16px var(--font-sans); }
+.menu-empty { zoom: var(--ui-scale); padding: 12px 12px; color: var(--ink-3); font: 400 13px/20px var(--font-sans); }
+
+/* searchable menus keep one width however many items are drawn; long names are cut */
+.menu-fixed { box-sizing: border-box; width: var(--menu-w); }
+md-menu-item:not(.menu-fixed) .menu-label { max-width: 230px; } /* menus without a fixed width stop growing at 320px */
+.menu-label { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-spacer { zoom: var(--ui-scale); }
+
+/* The transcript ends in a soft fade instead of a hard edge, so text is never sliced in half above the input.
+   Eased (smoothstep-like) stops over 56px read as a gradual dimming; the content's bottom padding (56px) keeps the
+   last line clear of it. */
+.thread-fade {
+  mask-image: linear-gradient(to bottom,
+    #000 calc(100% - 56px),
+    rgb(0 0 0 / 0.96) calc(100% - 49px),
+    rgb(0 0 0 / 0.85) calc(100% - 42px),
+    rgb(0 0 0 / 0.66) calc(100% - 35px),
+    rgb(0 0 0 / 0.44) calc(100% - 28px),
+    rgb(0 0 0 / 0.24) calc(100% - 21px),
+    rgb(0 0 0 / 0.1) calc(100% - 14px),
+    rgb(0 0 0 / 0.03) calc(100% - 7px),
+    transparent);
+}
+
+/* Markdown tables, code and long formulas scroll within the question, never widen the form. */
+.question-form { min-width: 0; }
+.question-form .md { min-width: 0; overflow-wrap: anywhere; }

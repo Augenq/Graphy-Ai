@@ -1,0 +1,30 @@
+import { open } from './lib.mjs';
+const U='http://localhost:5191/#school'; const log=(...a)=>console.log(...a);
+// ---- student 1: full pass
+const S = await open('S1'); let p = S.p;
+await p.goto(U, { waitUntil: 'networkidle' }); await p.waitForTimeout(2000);
+log('S1 list:', (await p.innerText('[data-ss-list]')).replace(/\n+/g,' | ').slice(0,200));
+await p.screenshot({ path: 's1-list.png' });
+await p.click('[data-ss-item]'); await p.waitForSelector('[data-ss-detail]');
+log('S1 detail:', (await p.innerText('[data-ss-detail]')).replace(/\n+/g,' | ').slice(0,300));
+await p.click('[data-ss-start]'); await p.waitForSelector('[data-ss-run]');
+await p.screenshot({ path: 's2-q1.png' });
+log('Q1:', (await p.innerText('[data-ss-run]')).replace(/\n+/g,' | ').slice(0,250));
+await p.getByText('5/6', { exact: true }).click();
+await p.getByRole('button', { name: 'Далее' }).click();
+await p.getByText('1/2', { exact: true }).click();
+await p.getByRole('button', { name: 'Далее' }).click();
+await p.locator('textarea').first().fill('Привести к общему знаменателю и сложить числители');
+await p.getByRole('button', { name: 'Обзор' }).click(); await p.waitForTimeout(500);
+await p.screenshot({ path: 's3-review.png' });
+await p.click('[data-ss-submit]'); await p.waitForSelector('[data-ss-result]');
+log('S1 result:', (await p.innerText('[data-ss-result]')).replace(/\n+/g,' | ').slice(0,300));
+await p.screenshot({ path: 's4-result.png' });
+log('S1 errs', p.errs.filter(e=>!/models\/refresh|400 \(Bad/.test(e))); await S.b.close();
+// ---- student 2: starts, leaves
+const S2 = await open('S2'); p = S2.p;
+await p.goto(U, { waitUntil: 'networkidle' }); await p.waitForTimeout(1500);
+await p.click('[data-ss-item]'); await p.click('[data-ss-start]'); await p.waitForSelector('[data-ss-run]');
+await p.getByText('2/5', { exact: true }).click(); await p.waitForTimeout(2500);
+log('S2 sync:', await p.locator('[data-ss-sync]').innerText());
+await S2.b.close();

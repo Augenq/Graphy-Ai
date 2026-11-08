@@ -1,0 +1,101 @@
+/* Study: calendar, review list, task bank. Tokens come from index.css (Material roles), so light and dark follow the theme. */
+.study-view { position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 0 12px; width: 100%; box-sizing: border-box; }
+.study-head { margin-top: -6px; padding: 4px 0 12px; }
+.study-sub { margin: 0; color: var(--ink-2); max-width: 60ch; font: 400 14px/20px var(--font-sans); }
+.study-bar { border-bottom: 1px solid var(--rule); }
+.study-bar .ui-tabs { --md-primary-tab-container-color: transparent; }
+.study-scroll { flex: 1; min-height: 0; padding: 16px 2px 32px; overflow: auto; }
+.study-loading { display: flex; align-items: center; gap: 8px; color: var(--ink-2); margin: 0; }
+.study-error { display: flex; align-items: center; gap: 8px; padding: 8px 16px; margin-bottom: 12px; border-radius: var(--r-md); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); font: 400 13px/20px var(--font-sans); }
+.study-error-text { margin: 0; color: var(--md-sys-color-error); font: 400 13px/18px var(--font-sans); }
+.study-muted { color: var(--ink-3); font: 400 13px/18px var(--font-sans); margin: 0; }
+.study-h2 { margin: 0; font: 500 18px/26px var(--font-sans); color: var(--ink); }
+.study-h3 { margin: 16px 0 8px; font: 500 15px/22px var(--font-sans); color: var(--ink); }
+.study-spacer { flex: 1; }
+.study-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; margin: 48px auto; max-width: 440px; color: var(--ink-2); }
+.study-empty-title { margin: 0; font: 500 16px/24px var(--font-sans); color: var(--ink); }
+.study-empty-text { margin: 0; font: 400 13px/20px var(--font-sans); }
+.study-input, .study-select { box-sizing: border-box; min-height: 36px; padding: 6px 10px; border: 1px solid var(--rule-2); border-radius: var(--r-md); background: var(--sheet); color: var(--ink); font: 400 14px/20px var(--font-sans); min-width: 0; }
+.study-input:focus-visible, .study-select:focus-visible, .study-cell:focus-visible, .study-card-q:focus-visible, .study-kind:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+.study-input::placeholder { color: var(--ink-3); }
+
+/* outcome chips and pills: calm tones, hints never look like success */
+.study-chip, .study-pill { flex: none; display: inline-flex; align-items: center; padding: 1px 10px; border-radius: 999px; font: 500 12px/20px var(--font-sans); background: var(--wash); color: var(--ink-2); white-space: nowrap; }
+.study-chip[data-outcome=independent] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.study-chip[data-outcome=with_hints], .study-pill[data-weak] { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+.study-chip[data-outcome=gap] { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+
+/* calendar */
+.study-countdown { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+.study-count-card { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-radius: 12px; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); min-width: 180px; }
+.study-count-card .study-muted { color: inherit; opacity: .8; }
+.study-count-days { font: 500 20px/28px var(--font-sans); }
+.study-count-title { font: 400 14px/20px var(--font-sans); }
+.study-cal-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+.study-month-bar { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+.study-grid { display: flex; flex-direction: column; gap: 4px; }
+.study-grid-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.study-weekday { text-align: center; color: var(--ink-3); font: 500 12px/20px var(--font-sans); text-transform: capitalize; }
+.study-cell { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 64px; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet); color: var(--ink); cursor: pointer; text-align: left; font-family: var(--font-sans); transition: background-color var(--dur-fast) var(--ease-default), border-color var(--dur-fast) var(--ease-default), transform var(--dur-instant) var(--ease-default); }
+.study-cell:hover { background: var(--wash); }
+.study-cell[data-out] { opacity: .5; }
+.study-cell[data-today] .study-cell-num { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.study-cell[aria-selected=true] { border-color: var(--md-sys-color-primary); box-shadow: inset 0 0 0 1px var(--md-sys-color-primary); }
+.study-cell[data-has-exam] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.study-cell-num { display: grid; place-items: center; min-width: 24px; height: 24px; border-radius: 12px; font: 500 13px/1 var(--font-sans); }
+.study-cell-marks { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.study-mark-review { padding: 0 6px; border-radius: 9px; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font: 500 11px/18px var(--font-sans); }
+.study-mark-event { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--md-sys-color-tertiary); }
+.study-mark-event[data-kind=exam] { background: var(--md-sys-color-error); }
+.study-mark-event[data-kind=note] { background: var(--ink-3); }
+.study-cal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.study-day { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet); position: sticky; top: 0; }
+.study-day .study-h3 { margin: 0; }
+.study-day-line { margin: 0; font: 400 14px/20px var(--font-sans); }
+.study-day-topics { margin: 0; padding-inline-start: 18px; font: 400 14px/20px var(--font-sans); }
+.study-events { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.study-event { display: flex; align-items: center; gap: 8px; padding: 6px 4px 6px 8px; border-radius: 8px; background: var(--wash); font: 400 14px/20px var(--font-sans); }
+.study-event-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.study-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.study-kinds { display: flex; gap: 6px; flex-wrap: wrap; }
+.study-kind { padding: 4px 12px; border: 1px solid var(--rule-2); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; font: 400 13px/20px var(--font-sans); }
+.study-kind[aria-checked=true] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); border-color: transparent; }
+.study-time { display: flex; flex-direction: column; gap: 2px; color: var(--ink-3); font: 400 12px/16px var(--font-sans); }
+
+/* review list and bank */
+.study-review-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.study-topics, .study-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.study-topic { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet); }
+.study-topic-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.study-topic-name { font: 500 14px/20px var(--font-sans); color: var(--ink); overflow-wrap: anywhere; }
+.study-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--wash); }
+.study-row-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 14px/20px var(--font-sans); }
+.study-row-meta { flex: none; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.study-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; margin-bottom: 12px; }
+.study-search { flex: 1 1 220px; }
+.study-filter { display: flex; flex-direction: column; gap: 2px; color: var(--ink-3); font: 400 12px/16px var(--font-sans); }
+.study-select { max-width: 200px; }
+.study-bank-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.study-card { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet); }
+.study-card[data-suspended] { opacity: .65; }
+.study-card-head { display: flex; align-items: flex-start; gap: 10px; }
+.study-card-q { flex: 1; min-width: 0; padding: 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; font: 500 14px/20px var(--font-sans); overflow-wrap: anywhere; }
+.study-card-meta { overflow-wrap: anywhere; }
+.study-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.study-tag { display: inline-flex; align-items: center; gap: 4px; padding: 0 4px 0 10px; border-radius: 999px; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); font: 400 12px/20px var(--font-sans); }
+.study-tag button { border: 0; background: none; color: inherit; cursor: pointer; padding: 0 6px; font-size: 14px; }
+.study-detail { display: flex; flex-direction: column; gap: 8px; padding: 8px 12px; border-radius: 10px; background: var(--wash); font: 400 14px/20px var(--font-sans); }
+.study-detail p { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.study-inline { display: flex; gap: 8px; align-items: center; }
+.study-inline .study-input { flex: 1; }
+.study-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+
+@media (max-width: 900px) {
+  .study-cal-layout { grid-template-columns: minmax(0, 1fr); }
+  .study-day { position: static; }
+  .study-cell { min-height: 52px; padding: 4px; }
+  .study-row-meta { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .study-cell { transition: none; }
+}

@@ -1,0 +1,162 @@
+# SearXNG for the Graphy agent (local compose service and the VPS copy /opt/graphy/searxng.yml).
+# Standalone: valid for the stock searxng/searxng image. The secret key, bind address and port come
+# from the environment (SEARXNG_SECRET, SEARXNG_BIND_ADDRESS, SEARXNG_PORT) as before.
+#
+# Engine set re-chosen by testing 97 candidates from the dev network (2026-11-07, see .orch/results/F5.md):
+# only engines that returned results in repeated runs are enabled. Availability is IP/network dependent
+# (engines captcha / rate-limit data-centre and home IPs), so re-test from the deployment network.
+# Failed here: google, qwant, duckduckgo, yahoo, brave (too many requests), mojeek (access denied),
+# startpage (timeout), marginalia, core, pubmed, openaire, yep, baidu, sogou, naver and others.
+# Several engines are marked inactive upstream (kept off by default); they work here, so inactive is
+# overridden to false below.
+use_default_settings:
+  engines:
+    keep_only:
+      - bing
+      - yandex
+      - keenable
+      - swisscows
+      - kozmonavt
+      - seznam
+      - s1search
+      - avalw
+      - fynd
+      - mwmbl
+      - wikipedia
+      - wikibooks
+      - wikiversity
+      - wikisource
+      - arxiv
+      - crossref
+      - semantic scholar
+      - openalex
+      - bing news
+
+general:
+  instance_name: "Graphy search"
+  enable_metrics: false
+
+server:
+  limiter: false            # internal network, one app: the bot limiter would only block the agent
+  public_instance: false
+  image_proxy: false
+
+search:
+  formats: [html, json]     # json is what the agent calls
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "ru"        # Russian-first; English queries still return English results
+  max_page: 1
+  # Short suspension for transient failures so engines come back soon; real blocks stay off longer.
+  suspended_times:
+    SearxEngineAccessDenied: 3600
+    SearxEngineCaptcha: 3600
+    SearxEngineTooManyRequests: 300
+    cf_SearxEngineCaptcha: 3600
+    cf_SearxEngineAccessDenied: 3600
+    recaptcha_SearxEngineCaptcha: 3600
+
+outgoing:
+  request_timeout: 7.0      # per engine; a dead engine must not hold the whole answer
+  max_request_timeout: 10.0 # hard cap for the whole query
+  pool_connections: 50
+  pool_maxsize: 20
+  enable_http2: false
+  retries: 0
+
+engines:
+  - name: bing
+    disabled: false
+    inactive: false
+    weight: 2
+    timeout: 6.5
+  - name: yandex
+    disabled: false
+    inactive: false
+    weight: 2
+    timeout: 6.5
+  - name: keenable
+    disabled: false
+    inactive: false
+    weight: 1.5
+    timeout: 6.5
+  - name: swisscows
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 6.5
+  - name: kozmonavt
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 6.5
+  - name: seznam
+    disabled: false
+    inactive: false
+    weight: 0.6
+    timeout: 6.5
+  - name: s1search
+    disabled: false
+    inactive: false
+    weight: 0.6
+    timeout: 6.5
+  - name: avalw
+    disabled: false
+    inactive: false
+    weight: 0.5
+    timeout: 6.5
+  - name: fynd
+    disabled: false
+    inactive: false
+    weight: 0.5
+    timeout: 6.5
+  - name: mwmbl
+    disabled: false
+    inactive: false
+    weight: 0.5
+    timeout: 6.5
+  - name: wikipedia
+    disabled: false
+    inactive: false
+    weight: 1.5
+    timeout: 5
+  - name: wikibooks
+    disabled: false
+    inactive: false
+    weight: 0.8
+    timeout: 5
+  - name: wikiversity
+    disabled: false
+    inactive: false
+    weight: 0.8
+    timeout: 5
+  - name: wikisource
+    disabled: false
+    inactive: false
+    weight: 0.6
+    timeout: 5
+  - name: arxiv
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 6.5
+  - name: crossref
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 7
+  - name: semantic scholar
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 7
+  - name: openalex
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 7
+  - name: bing news
+    disabled: false
+    inactive: false
+    weight: 1
+    timeout: 6.5

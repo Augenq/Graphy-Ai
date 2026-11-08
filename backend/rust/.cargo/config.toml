@@ -1,0 +1,7 @@
+# Faster, more reliable dependency fetching/builds (sparse index; stable in CI/Docker).
+[registries.crates-io]
+protocol = "sparse"
+
+[net]
+git-fetch-with-cli = true
+retry = 3

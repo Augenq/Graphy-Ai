@@ -1,0 +1,65 @@
+/* Input surface: message queue, attachments, drop overlay, sketch editor, palette sections, rich blocks in questions. */
+
+/* ---- queue, inside the composer's reach ---- */
+.mq { margin: 0 0 8px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 16px; background: var(--md-sys-color-surface-container-low); overflow: hidden; animation: mq-in 180ms cubic-bezier(0.2, 0, 0, 1); }
+.mq-head { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 8px 0 14px; font: 500 13px/20px "Roboto"; color: var(--md-sys-color-on-surface-variant); }
+.mq-head md-icon { width: 18px; height: 18px; font-size: 18px; }
+.mq-split { font-weight: 400; opacity: 0.85; }
+.mq-note { margin: 0; padding: 0 14px 8px; font: 400 12px/16px "Roboto"; color: var(--md-sys-color-on-surface-variant); }
+.mq-list { list-style: none; margin: 0; padding: 0 6px 6px; display: flex; flex-direction: column; gap: 2px; max-height: 188px; overflow-y: auto; scrollbar-width: thin; }
+.mq-row { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 4px 0 10px; border-radius: 10px; font: 400 14px/20px "Roboto"; color: var(--md-sys-color-on-surface); animation: mq-in 160ms cubic-bezier(0.2, 0, 0, 1); }
+.mq-row:hover, .mq-row:focus-within { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent); }
+.mq-row:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: -2px; }
+.mq-kind { flex: none; padding: 1px 8px; border-radius: 8px; font: 500 11px/16px "Roboto"; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.mq-row[data-followup="true"] .mq-kind { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); }
+.mq-text { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mq-actions { flex: none; display: inline-flex; --md-icon-button-icon-size: 18px; --md-icon-button-state-layer-height: 32px; --md-icon-button-state-layer-width: 32px; }
+.mq-actions md-icon-button { width: 32px; height: 32px; }
+@keyframes mq-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---- drop overlay ---- */
+.attach-drop { position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: inherit; background: color-mix(in srgb, var(--md-sys-color-primary) 14%, var(--md-sys-color-surface)); border: 2px dashed var(--md-sys-color-primary); color: var(--md-sys-color-primary); font: 500 14px/20px "Roboto"; pointer-events: none; animation: mq-in 120ms ease-out; }
+.composer-surface[data-drop] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 30%, transparent); }
+
+/* ---- materials dialog ---- */
+.materials-dialog { min-width: min(420px, 80vw); }
+.materials-list { list-style: none; margin: 0; padding: 0; max-height: 50vh; overflow-y: auto; }
+
+/* ---- sketch editor ---- */
+.sketch { display: flex; flex-direction: column; gap: 10px; width: min(860px, 86vw); }
+.sketch-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.sketch-group { display: inline-flex; align-items: center; gap: 2px; }
+.sketch-group md-icon-button[selected] { background: var(--md-sys-color-secondary-container); border-radius: 100px; }
+.sketch-swatch { width: 24px; height: 24px; margin: 0 3px; padding: 0; border-radius: 50%; border: 2px solid var(--md-sys-color-outline-variant); cursor: pointer; }
+.sketch-swatch[aria-pressed="true"] { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
+.sketch-size { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; color: var(--md-sys-color-on-surface); }
+.sketch-size span { display: block; width: 18px; border-radius: 4px; background: currentColor; }
+.sketch-size[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); }
+.sketch-swatch:focus-visible, .sketch-size:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
+.sketch-stage { position: relative; line-height: 0; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 12px; overflow: hidden; }
+.sketch-stage canvas { width: 100%; height: auto; display: block; aspect-ratio: 800 / 520; }
+.sketch-text { position: absolute; min-width: 140px; padding: 2px 6px; font: 400 14px/20px "Roboto"; color: var(--md-sys-color-on-surface); background: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-primary); border-radius: 6px; }
+.sketch-note { margin: 0; font: 400 12px/16px "Roboto"; color: var(--md-sys-color-on-surface-variant); }
+.sketch-error { margin: 0; font: 500 13px/18px "Roboto"; color: var(--md-sys-color-error); }
+.sketch-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ---- palette ---- */
+.palette-section { list-style: none; padding: 10px 16px 4px; font: 500 11px/16px "Roboto"; letter-spacing: 0.04em; text-transform: uppercase; color: var(--md-sys-color-on-surface-variant); }
+.palette-hint { flex: none; padding: 1px 6px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 6px; font: 500 11px/16px "Roboto"; color: var(--md-sys-color-on-surface-variant); }
+
+/* ---- rich blocks in questions ---- */
+.rm-chart { margin: 12px 0; padding: 12px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 12px; background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); }
+.rm-chart figcaption { font: 500 13px/18px "Roboto"; margin-bottom: 6px; }
+.rm-chart-svg { display: block; width: 100%; max-width: 480px; height: auto; }
+.rm-data { margin-top: 6px; font: 400 12px/16px "Roboto"; color: var(--md-sys-color-on-surface-variant); }
+.rm-data p { margin: 4px 0 0; }
+.rm-svg { margin: 12px 0; padding: 8px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 12px; background: #fff; }
+.rm-svg img { display: block; max-width: 100%; max-height: 360px; margin: 0 auto; }
+.rm-html-host { display: block; margin: 12px 0; padding: 10px 12px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 12px; }
+.rm-problem { display: flex; align-items: center; gap: 8px; margin: 8px 0; padding: 8px 12px; border-radius: 10px; font: 400 13px/18px "Roboto"; color: var(--md-sys-color-on-error-container); background: var(--md-sys-color-error-container); }
+.rm-img { max-width: 100%; border-radius: 8px; }
+.rm-remote-img { display: inline-flex; align-items: baseline; gap: 6px; padding: 2px 8px; border-radius: 8px; background: var(--md-sys-color-surface-container-high); font-size: 0.92em; }
+.rm-remote-img small { opacity: 0.8; }
+
+@media (prefers-reduced-motion: reduce) { .mq, .mq-row, .attach-drop { animation: none; } }
+@media (max-width: 640px) { .mq-kind { display: none; } .sketch { width: 90vw; } }

@@ -1,0 +1,76 @@
+/* Files the agent presents (present_file): the card in the chat and the viewer beside it. */
+
+/* ---- the card in the transcript ---- */
+.pf-card {
+  display: flex; align-items: center; gap: 16px; width: 100%; padding: 20px 22px; box-sizing: border-box; text-align: left; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: var(--r-xl); background: var(--sheet); color: var(--ink); font: inherit;
+  transition: background-color var(--dur-fast) var(--ease-default), border-color var(--dur-fast) var(--ease-default);
+}
+.pf-card:hover { background: var(--md-sys-color-surface-container-low, var(--sheet)); border-color: var(--rule-2, var(--rule)); }
+.pf-card:focus-visible { outline: 2px solid var(--focus-indicator, var(--ink)); outline-offset: 2px; }
+.pf-card[aria-pressed="true"] { border-color: var(--rule-2, var(--rule)); }
+.pf-card-icon {
+  display: inline-grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(224, 96, 80, .18); color: #e8695a;
+}
+.pf-card-text { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.pf-card-title { font: 500 18px/26px var(--font-sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-card-kind { font: 400 15px/22px var(--font-sans); color: var(--ink-3); }
+
+/* ---- the viewer ---- */
+.pf-viewer {
+  display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; box-sizing: border-box; overflow: hidden;
+  margin: 0 12px 12px 0; border: 1px solid var(--rule); border-radius: var(--r-xl); background: var(--sheet); color: var(--ink);
+}
+.pf-head { display: flex; align-items: center; gap: 8px; flex: none; height: 56px; padding: 0 8px 0 20px; }
+.pf-title { flex: 1; min-width: 0; margin: 0; display: flex; font: 500 16px/24px var(--font-sans); }
+.pf-title-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pf-title-kind { flex: none; white-space: pre; color: var(--ink-3); font-weight: 400; }
+.pf-actions { display: flex; align-items: center; gap: 2px; flex: none; }
+.pf-body { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--paper); }
+.pf-scroll { flex: 1; min-height: 0; overflow: auto; padding: 24px 20px 32px; display: flex; flex-direction: column; align-items: center; }
+/* a document page: paper-white in both themes, like a printed sheet */
+.pf-page {
+  box-sizing: border-box; width: min(100%, 720px); padding: 40px 44px 48px; border-radius: 4px; background: #fff; color: #1d1f23;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .18), 0 0 0 1px rgba(0, 0, 0, .05); font: 400 14px/22px var(--font-sans); overflow-wrap: anywhere;
+  color-scheme: light; --ink: #1d1f23; --ink-2: #3a3f47; --ink-3: #6a707b; --rule: #d7dae0; --rule-2: #c3c7ce; --sheet: #fff; --paper: #fff; --wash: #f1f2f4;
+}
+.pf-page .md, .pf-page .md * { color: inherit; }
+.pf-page .md h1, .pf-page .md h2, .pf-page .md h3 { color: #14284b; }
+.pf-page .md table { width: 100%; } .pf-page .md th { background: #f1f2f4; }
+.pf-page.is-wide { width: max-content; min-width: min(100%, 520px); max-width: 100%; overflow-x: auto; }
+.pf-page h1, .pf-page h2, .pf-page h3 { color: #14284b; line-height: 1.25; }
+.pf-page h1 { font-size: 26px; margin: 0 0 .6em; } .pf-page h2 { font-size: 19px; margin: 1.4em 0 .5em; } .pf-page h3 { font-size: 16px; margin: 1.2em 0 .4em; }
+.pf-page p { margin: 0 0 .8em; } .pf-page ul, .pf-page ol { padding-left: 1.4em; margin: 0 0 .8em; }
+.pf-page img { max-width: 100%; height: auto; }
+.pf-page a { color: #1a56c4; }
+.pf-page code, .pf-page pre { font-family: var(--font-mono, ui-monospace, monospace); font-size: 13px; background: #f1f2f4; border-radius: 4px; }
+.pf-page code { padding: 1px 4px; } .pf-page pre { padding: 10px 12px; overflow-x: auto; }
+.pf-page blockquote { margin: 0 0 .8em; padding-left: 12px; border-left: 3px solid #cfd3da; color: #4a4f58; }
+.pf-page table, .pf-table { border-collapse: collapse; font-size: 13px; }
+.pf-page th, .pf-page td { border: 1px solid #d7dae0; padding: 5px 10px; text-align: left; vertical-align: top; }
+.pf-page th { background: #f1f2f4; font-weight: 600; }
+.pf-pre { margin: 0; padding: 0; background: none !important; white-space: pre-wrap; font-family: var(--font-mono, ui-monospace, monospace); font-size: 13px; line-height: 20px; }
+.pf-md .katex { font-size: 1.05em; }
+.pf-tabs { display: flex; gap: 4px; margin: -8px 0 12px; }
+.pf-tabs button { padding: 4px 12px; border: 1px solid #d7dae0; border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.pf-tabs button[aria-selected="true"] { background: #1d1f23; border-color: #1d1f23; color: #fff; }
+.pf-more { margin: 12px 0 0; color: #6a707b; font-size: 13px; }
+.pf-img { max-width: 100%; height: auto; border-radius: 6px; background: #fff; box-shadow: 0 0 0 1px var(--rule); }
+.pf-pdf, .pf-html { flex: 1; width: 100%; min-height: 0; border: 0; background: var(--paper); }
+.pf-html { background: #fff; color-scheme: light; }
+.pf-notice { margin: auto; padding: 24px; color: var(--ink-3); font: 400 14px/20px var(--font-sans); text-align: center; }
+.pf-nopreview { margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 320px; padding: 24px; text-align: center; color: var(--ink-3); font: 400 14px/20px var(--font-sans); }
+.pf-nopreview strong { color: var(--ink); font-weight: 500; }
+.pf-download-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; height: 36px; padding: 0 16px; border: 1px solid var(--rule); border-radius: 999px; background: transparent; color: var(--ink); font: 500 14px/20px var(--font-sans); cursor: pointer; }
+.pf-download-btn:hover { background: var(--md-sys-color-surface-container-low, var(--sheet)); }
+
+/* ---- full screen ---- */
+.pf-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; background: var(--paper); }
+.pf-overlay .pf-viewer { margin: 0; border: 0; border-radius: 0; background: var(--paper); }
+.pf-overlay .pf-head { height: 64px; padding: 0 16px 0 24px; }
+.pf-overlay .pf-body { align-items: stretch; }
+.pf-overlay .pf-page { width: min(100%, 860px); }
+
+@media (forced-colors: active) { .pf-card, .pf-viewer { border: 1px solid CanvasText; } .pf-card-icon { background: Canvas; color: CanvasText; } }
+@media (prefers-reduced-motion: reduce) { .pf-card { transition: none; } }

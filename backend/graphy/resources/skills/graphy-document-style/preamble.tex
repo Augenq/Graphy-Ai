@@ -1,0 +1,20 @@
+% Graphy document style, XeLaTeX preamble ("Russian classic"): Computer Modern 12/15, A4, black on white.
+% Usage: copy next to your .tex, then  \input{preamble}  right after \documentclass[12pt]{article}.
+% Compile: timeout 90 xelatex -interaction=nonstopmode -halt-on-error doc.tex   (twice if there are references)
+\usepackage[a4paper,left=32mm,right=28mm,top=28mm,bottom=34mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,fontspec}
+\IfFontExistsTF{CMU Serif}{\setmainfont{CMU Serif}\setsansfont{CMU Sans Serif}\setmonofont{CMU Typewriter Text}}{\setmainfont{DejaVu Serif}}
+\usepackage[russian]{babel}
+\linespread{1.25}\setlength{\parindent}{1.5em}\setlength{\parskip}{0pt}
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{0pt}{2.2ex plus .5ex}{1ex}{\normalfont\Large\bfseries\raggedright}}
+\renewcommand\subsection{\@startsection{subsection}{2}{0pt}{1.8ex plus .4ex}{.8ex}{\normalfont\large\bfseries\raggedright}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{0pt}{1.4ex}{-.5em}{\normalfont\bfseries}}
+\makeatother
+\theoremstyle{definition}\newtheorem{definition}{Определение}[section]
+\newtheorem{example}{Пример}[section]
+\theoremstyle{plain}\newtheorem{theorem}{Теорема}[section]\newtheorem{lemma}{Лемма}[section]
+\theoremstyle{remark}\newtheorem{remark}{Замечание}[section]
+\renewcommand{\qedsymbol}{$\square$}
+\renewcommand{\proofname}{Доказательство}
+\pagestyle{plain}

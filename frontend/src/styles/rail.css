@@ -1,0 +1,111 @@
+/* The lesson's right column lives inside the chat area: no dock, no background, no border; a presented file takes its place while it is open. */
+.lesson-body { position: relative; display: flex; flex: 1; min-height: 0; min-width: 0; container-type: inline-size; container-name: lesson; }
+.lesson-chat { display: flex; flex-direction: column; flex: 1; min-width: min(560px, 100%); min-height: 0; }
+.lesson-panel { --panel-w: 300px; display: flex; flex-direction: column; flex-shrink: 0; align-self: stretch; min-height: 0; width: var(--panel-w); overflow: hidden; background: transparent; border: 0; box-shadow: none; }
+.lesson-panel[data-mode="file"] { --panel-w: min(46cqw, 720px, calc(100cqw - 560px)); }
+.lesson-panel > * { width: var(--panel-w); flex-shrink: 0; }
+/* the column slides out of the right edge and back, as the old dock did: the slot grows while its content slides in */
+/* Material 3 motion: emphasized-decelerate in (450ms), emphasized-accelerate out (250ms); the content also fades */
+.lesson-panel { --m3-in: cubic-bezier(.05, .7, .1, 1); --m3-out: cubic-bezier(.3, 0, .8, .15); }
+.lesson-panel.is-enter { animation: panel-slot-in 450ms var(--m3-in) both; will-change: width; }
+.lesson-panel.is-enter > * { animation: panel-content-in 450ms var(--m3-in) both; }
+.lesson-panel.is-exit { animation: panel-slot-out 250ms var(--m3-out) forwards; pointer-events: none; will-change: width; }
+.lesson-panel.is-exit > * { animation: panel-content-out 250ms var(--m3-out) forwards; }
+/* rail <-> file keeps the column mounted: its width eases, so the chat slides left on open and back right on close */
+.lesson-panel.is-armed { transition: width 350ms var(--m3-in); }
+.lesson-panel.is-armed > * { transition: width 350ms var(--m3-in); }
+@keyframes panel-slot-in { from { width: 0; } }
+@keyframes panel-slot-out { to { width: 0; } }
+@keyframes panel-content-in { from { transform: translateX(48px); opacity: 0; } }
+@keyframes panel-content-out { to { transform: translateX(48px); opacity: 0; } }
+@keyframes panel-overlay-in { from { transform: translateX(100%); } }
+@keyframes panel-overlay-out { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .lesson-panel.is-armed, .lesson-panel.is-armed > *, .lesson-panel.is-enter, .lesson-panel.is-enter > *, .lesson-panel.is-exit, .lesson-panel.is-exit > * { animation: none; transition: none; } }
+/* a narrow chat area has no room for a column: the rail simply steps aside */
+@container lesson (max-width: 760px) { .lesson-panel[data-mode="rail"] { display: none; } }
+@container lesson (max-width: 839px) {
+  .lesson-panel[data-mode="file"] { position: absolute; inset: 0; z-index: 5; width: auto; background: var(--paper); }
+  .lesson-panel[data-mode="file"] > * { width: auto; flex: 1; min-height: 0; }
+  .lesson-panel[data-mode="file"].is-enter { animation-name: panel-overlay-in; }
+  .lesson-panel[data-mode="file"].is-exit { animation-name: panel-overlay-out; }
+  .lesson-panel[data-mode="file"].is-enter > *, .lesson-panel[data-mode="file"].is-exit > * { animation: none; }
+}
+
+.rail { display: flex; flex-direction: column; gap: 12px; min-height: 0; flex: 1; padding: 12px 16px 12px 4px; }
+.rail-card {
+  flex-shrink: 0; padding: 4px 4px 8px; border: 1px solid var(--rule); border-radius: var(--r-xl); background: var(--sheet); color: var(--ink);
+  font: 400 13px/20px var(--font-sans);
+}
+.rail-card-title {
+  display: flex; align-items: center; gap: 4px; width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r-lg); background: transparent; color: var(--ink);
+  font: 500 13px/20px var(--font-sans); text-align: left; cursor: pointer;
+}
+.rail-card-title:hover { background: var(--wash); }
+.rail-card-title:focus-visible, .rail-more:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: -2px; }
+.rail-chevron { width: 12px; height: 12px; color: var(--ink-3); transition: transform 150ms; }
+.rail-chevron.is-closed { transform: rotate(-90deg); }
+.rail-card-meta { margin-left: auto; font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rail-card-body { padding: 0 10px; }
+.rail-card-body[hidden] { display: none; }
+.rail-goal { margin: 2px 0 8px; font: 500 13px/18px var(--font-sans); color: var(--ink); }
+.rail-hint { margin: 2px 0 8px; font: 400 12px/16px var(--font-sans); color: var(--ink-3); }
+.rail-steps, .rail-rows { margin: 0; padding: 0; list-style: none; }
+.rail-step { display: flex; align-items: flex-start; gap: 8px; min-height: 24px; padding: 2px 0; font: 400 13px/20px var(--font-sans); color: var(--ink-2); }
+.rail-step.is-child { padding-left: 20px; }
+.rail-dot { flex-shrink: 0; box-sizing: border-box; width: 14px; height: 14px; margin-top: 3px; border: 1.5px solid var(--rule-2); border-radius: 50%; }
+.rail-step[data-status="done"] .rail-dot { background: var(--ink); border-color: var(--ink); }
+.rail-step[data-status="cur"] .rail-dot { border-color: var(--accent-ui, var(--accent)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-ui, var(--accent)) 28%, transparent); }
+.rail-step[data-status="cur"] { color: var(--ink); font-weight: 500; }
+.rail-step[data-status="done"] { color: var(--ink-3); }
+.rail-step-text { min-width: 0; flex: 1; }
+.rail-row { display: flex; align-items: center; gap: 8px; min-height: 28px; font: 400 13px/20px var(--font-sans); color: var(--ink); }
+.rail-row-icon { flex-shrink: 0; width: 16px; height: 16px; color: var(--ink-2); }
+.rail-row-name { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rail-row-val, .rail-row-pct { flex-shrink: 0; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rail-row-pct { min-width: 40px; text-align: right; color: var(--ink); }
+.rail-rows-sep { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--rule); }
+.rail-more { display: block; margin: 2px 0 0; padding: 2px 0; border: 0; background: transparent; color: var(--ink-3); font: 400 13px/20px var(--font-sans); cursor: pointer; }
+.rail-more:hover { color: var(--ink); }
+.rail-used { display: flex; align-items: baseline; justify-content: space-between; margin: 2px 0 6px; }
+.rail-used strong { font-weight: 500; font-size: 14px; }
+.rail-bar { height: 6px; margin-bottom: 8px; border-radius: 3px; background: var(--wash); overflow: hidden; }
+.rail-bar > span { display: block; height: 100%; border-radius: 3px; background: var(--accent-ui, var(--accent)); }
+.rail-bar > span.is-full { background: var(--danger); }
+.rail-swatch { flex-shrink: 0; width: 10px; height: 10px; border-radius: 3px; background: var(--wash); border: 1px solid var(--rule-2); box-sizing: border-box; }
+.rail-swatch.is-used { background: var(--accent-ui, var(--accent)); border-color: transparent; }
+
+.plan-graph {
+  --pg-a: #111DCD; --pg-b: #5719CE; --pg-c: #B014CC;
+  flex-shrink: 0; padding: 10px; border: 1px solid var(--rule);
+  border-radius: var(--r-xl); color: var(--ink); font: 400 13px/18px var(--font-sans);
+  background: var(--sheet); box-shadow: none;
+}
+.plan-graph-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+.plan-graph-title { font-weight: 600; font-size: 13px; }
+.plan-graph-meta { color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.plan-graph-goal { margin: 0 0 10px; color: var(--ink-2); font-size: 12px; line-height: 16px; }
+.plan-graph-flow { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.plan-graph-node { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.plan-graph-track { display: flex; flex-direction: column; align-items: center; }
+.plan-graph-dot { width: 10px; height: 10px; margin-top: 10px; border-radius: 999px; background: #8e8e93; box-shadow: 0 0 0 3px color-mix(in srgb, #8e8e93 16%, transparent); flex-shrink: 0; }
+.plan-graph-line { width: 2px; flex: 1; min-height: 12px; margin: 4px 0 -2px; background: #c7c7cc; border-radius: 2px; }
+.plan-graph-block { margin: 2px 0; padding: 8px 9px; border: 1px solid #d1d1d6; border-radius: 10px; background: #e5e5ea; color: #3a3a3c; min-width: 0; }
+.plan-graph-index { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; margin-right: 6px; padding: 0 5px; border-radius: 999px; background: #c7c7cc; color: #636366; font-size: 11px; font-weight: 600; vertical-align: 1px; }
+.plan-graph-text { font-size: 12px; line-height: 16px; word-break: break-word; }
+.plan-graph-node[data-status="done"] .plan-graph-dot { background: #636366; box-shadow: 0 0 0 3px color-mix(in srgb, #636366 14%, transparent); }
+.plan-graph-node[data-status="done"] .plan-graph-line { background: #aeaeb2; }
+.plan-graph-node[data-status="done"] .plan-graph-block { background: #d8d8dc; border-color: #c7c7cc; color: #636366; }
+.plan-graph-node[data-status="done"] .plan-graph-index { background: #bcbcc0; }
+.plan-graph-node[data-status="cur"] .plan-graph-dot { background: #48484a; box-shadow: 0 0 0 4px color-mix(in srgb, #48484a 18%, transparent); }
+.plan-graph-node[data-status="cur"] .plan-graph-block { background: #f2f2f7; border-color: #aeaeb2; color: #1c1c1e; box-shadow: 0 1px 0 rgb(0 0 0 / 0.04); }
+.plan-graph-node[data-status="cur"] .plan-graph-index { background: #8e8e93; color: #fff; }
+.plan-graph-node[data-status="cur"] .plan-graph-text { font-weight: 500; }
+html[data-theme="dark"] .plan-graph-block { background: #3a3a3c; border-color: #48484a; color: #d1d1d6; }
+html[data-theme="dark"] .plan-graph-node[data-status="done"] .plan-graph-block { background: #2c2c2e; border-color: #3a3a3c; color: #8e8e93; }
+html[data-theme="dark"] .plan-graph-node[data-status="cur"] .plan-graph-block { background: #48484a; border-color: #636366; color: #f2f2f7; }
+html[data-theme="dark"] .plan-graph-index { background: #636366; color: #d1d1d6; }
+html[data-theme="dark"] .plan-graph-node[data-status="cur"] .plan-graph-index { background: #aeaeb2; color: #1c1c1e; }
+html[data-theme="dark"] .plan-graph-line { background: #48484a; }
+html[data-theme="dark"] .plan-graph-goal { color: #aeaeb2; }
+
+.composer-toolbar { min-width: 0; }

@@ -1,0 +1,62 @@
+/* MAX-style restyle of the input surface (queue, attach, sketch, palette parts, run notice, rich blocks). Loads after input.css. */
+.mq { border: 1px solid var(--rule); border-radius: var(--r-lg); background: var(--sheet); }
+.mq-head { min-height: 36px; padding: 0 6px 0 10px; gap: 8px; color: var(--ink-2); font: 500 13px/20px var(--font-sans); }
+.mq-count.mq-count { flex: none; }
+.mq-title { min-width: 0; }
+.mq-split { color: var(--ink-3); font-weight: 400; opacity: 1; }
+.mq-note { padding: 0 10px 8px; color: var(--ink-3); font: 400 12px/16px var(--font-sans); }
+.mq-list { padding: 0 4px 4px; gap: 1px; }
+.mq-row { min-height: 32px; padding: 0 2px 0 8px; gap: 8px; border-radius: 6px; color: var(--ink); font: 400 13px/20px var(--font-sans); }
+.mq-row:hover, .mq-row:focus-within { background: var(--wash); }
+.mq-row:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: -2px; }
+.mq-kind { padding: 0 6px; border-radius: var(--r-sm); font: 500 11px/18px var(--font-sans); background: var(--bubble); color: var(--ink); }
+.mq-row[data-followup="true"] .mq-kind { background: var(--wash); color: var(--ink-2); }
+.mq-actions { gap: 0; }
+
+.attach-drop { border-color: var(--ink-3); background: color-mix(in srgb, var(--wash) 85%, transparent); color: var(--ink); font: 500 13px/20px var(--font-sans); }
+.composer-surface[data-drop] { box-shadow: 0 0 0 2px var(--rule-2); }
+.materials-dialog { min-width: min(420px, 80vw); }
+.materials-list { display: flex; flex-direction: column; gap: 1px; }
+.materials-list > li { list-style: none; }
+.materials-row { width: 100%; text-align: left; border-radius: var(--r-md); cursor: pointer; }
+.materials-row:hover { background: var(--wash); }
+.materials-row:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: -2px; }
+
+.sketch-bar { gap: 6px 12px; }
+.sketch-group { gap: 2px; }
+.sketch-swatch { width: 20px; height: 20px; margin: 0 4px; border: 1px solid var(--rule-2); }
+.sketch-swatch[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 2px; }
+.sketch-swatch:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+.sketch-size.ui-icon-button.ui-icon-button { color: var(--ink); }
+.sketch-size.ui-icon-button.ui-icon-button span:not(.sketch-line) { display: inline-flex; width: auto; height: auto; background: none; border-radius: 0; }
+.sketch-size .sketch-line { display: block; width: 14px; border-radius: 4px; background: currentColor; }
+.sketch-stage { border: 1px solid var(--rule); border-radius: var(--r-lg); }
+.sketch-text { font: 400 14px/20px var(--font-sans); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule-2); border-radius: var(--r-md); }
+.sketch-note { color: var(--ink-3); font: 400 12px/16px var(--font-sans); }
+.sketch-error { color: var(--danger); font: 500 13px/18px var(--font-sans); }
+
+.palette-section { padding: 10px 12px 4px; color: var(--ink-3); font: 500 11px/16px var(--font-sans); }
+.palette-hint { padding: 0 6px; border: 1px solid var(--rule-2); border-radius: var(--r-sm); color: var(--ink-2); font: 500 11px/18px var(--font-sans); }
+.search-result { border-radius: var(--r-md); }
+.search-result:hover { background: var(--wash); }
+
+
+.run-notice { padding: 8px 12px; border: 1px solid var(--rule); border-radius: var(--r-lg); background: var(--sheet); color: var(--ink); }
+.run-notice-text { gap: 2px; font: 400 13px/20px var(--font-sans); color: var(--ink-2); }
+.run-notice-title { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 500; }
+.run-notice-dot.run-notice-dot { flex: none; }
+.run-notice-error { color: var(--danger); }
+
+.rm-chart, .rm-svg, .rm-html-host { border: 1px solid var(--rule); border-radius: var(--r-lg); }
+.rm-chart { background: var(--sheet); color: var(--ink); padding: 10px 12px; }
+.rm-chart figcaption { font: 500 13px/20px var(--font-sans); }
+.rm-data { color: var(--ink-3); font: 400 12px/16px var(--font-sans); }
+.rm-problem { border-radius: var(--r-md); color: var(--danger); background: var(--wash); border: 1px solid var(--rule); font: 400 13px/20px var(--font-sans); }
+.rm-remote-img { border-radius: var(--r-sm); background: var(--wash); font-family: var(--font-sans); }
+
+/* dialog frames: the migrated Modal has no inner padding, so these bodies carry their own */
+.graphy-dialog-content.sketch-dialog, .graphy-dialog-content.materials-dialog { padding: 16px 20px 20px; box-sizing: border-box; }
+.graphy-dialog:has(.sketch-dialog) { width: min(900px, calc(100 * var(--app-vw) - 32px)); }
+.sketch { width: 100%; gap: 12px; }
+.sketch-actions { gap: 8px; }
+.sketch-stage { width: min(100%, calc((100 * var(--app-dvh) - 250px) * 800 / 520)); align-self: center; }

@@ -1,0 +1,1 @@
+Work from the actual attempt and support already given. Reduce support only when demonstrated; completion and analogy precede transfer when needed. Repeated errors call for another approach. Keep a pending answer hidden unless its solution is requested and allowed. A clarification or refusal does not start a new series.

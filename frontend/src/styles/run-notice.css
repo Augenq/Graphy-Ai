@@ -1,0 +1,19 @@
+/* Stalled-run banner above the composer. */
+.run-notice {
+  position: sticky; bottom: 8px; z-index: 5; margin: 8px auto; max-width: 720px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+  padding: 10px 14px; border-radius: 12px;
+  background: var(--md-sys-color-secondary-container, #3a3a3a); color: var(--md-sys-color-on-secondary-container, #fff);
+  border: 1px solid var(--md-sys-color-outline-variant, #666);
+}
+.run-notice-text { display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.run-notice-error { color: var(--md-sys-color-error, #f66); }
+.run-notice-actions { display: flex; gap: 8px; }
+.run-notice-btn {
+  min-height: 36px; padding: 0 14px; border-radius: 18px; cursor: pointer; font: inherit; font-weight: 500;
+  border: 1px solid var(--md-sys-color-outline, #888); background: transparent; color: inherit;
+}
+.run-notice-btn-quiet { background: var(--md-sys-color-primary, #7af); color: var(--md-sys-color-on-primary, #000); border-color: transparent; }
+.run-notice-btn:focus-visible { outline: 2px solid var(--md-sys-color-primary, #7af); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { .run-notice { animation: run-notice-in 160ms ease-out; } }
+@keyframes run-notice-in { from { opacity: 0; transform: translateY(6px); } }

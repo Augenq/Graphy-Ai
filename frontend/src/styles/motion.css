@@ -1,0 +1,28 @@
+/* Shared motion tokens (Cursor-measured, see docs/ui-overhaul-2026-11-08/report-cursor.md). Imported once from main.tsx. */
+:root {
+  --dur-instant: 50ms; --dur-fast: 100ms; --dur-normal: 150ms; --dur-slow: 200ms; --dur-slower: 300ms;
+  --ease-default: ease;
+  --ease-out-cubic: cubic-bezier(.215, .61, .355, 1);
+  --ease-out-quint: cubic-bezier(.16, 1, .3, 1);
+  --ease-out-strong: cubic-bezier(.165, .84, .44, 1);
+  --ease-in-out-strong: cubic-bezier(.77, 0, .175, 1);
+  --press-scale: .98;
+}
+
+/* Pressed feedback (Cursor): transform 50ms, color/background 100ms; rows get the colour change only, no scale. */
+.ui-button.ui-button, .ui-icon-button.ui-icon-button, button.ui-chip, .voice-button, md-icon-button, md-filled-button, md-filled-tonal-button, md-outlined-button, md-text-button {
+  transition: transform var(--dur-instant) var(--ease-default), background-color var(--dur-fast) var(--ease-default), color var(--dur-fast) var(--ease-default), border-color var(--dur-fast) var(--ease-default);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ui-button.ui-button:active:not(:disabled), .ui-icon-button.ui-icon-button:active:not(:disabled), button.ui-chip:active:not(:disabled),
+  .composer-panel .send-button.send-button.ui-icon-button:active:not(:disabled), .voice-button:active:not(:disabled),
+  md-icon-button:active:not([disabled]), md-filled-button:active:not([disabled]), md-filled-tonal-button:active:not([disabled]), md-outlined-button:active:not([disabled]), md-text-button:active:not([disabled]) {
+    transform: scale(var(--press-scale));
+  }
+}
+/* Icon buttons: a quiet ~8% wash on hover (white alpha in the dark theme, ink alpha in the light one). */
+.ui-icon-button.ui-icon-button[data-variant="ghost"]:hover:not(:disabled):not(.send-button):not(.question-step) {
+  --MaxUi-IconButton_background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+button.ui-chip { cursor: pointer; }
+button.ui-chip:disabled { cursor: default; }

@@ -1,0 +1,16 @@
+{
+  "PHASES": [
+    "diagnosis",
+    "planning",
+    "teaching",
+    "practice",
+    "review"
+  ],
+  "PHASE_LABELS": {
+    "diagnosis": "Диагностика",
+    "planning": "Планирование",
+    "teaching": "Обучение",
+    "practice": "Практика",
+    "review": "Итог"
+  }
+}

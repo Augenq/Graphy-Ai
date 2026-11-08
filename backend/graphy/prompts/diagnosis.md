@@ -1,0 +1,1 @@
+Use the current request to start: a single topic needs no interview or plan. For a course-sized goal, resolve only unknown purpose or preparation that changes the route. A preference, acknowledgement or objection is not an assessed attempt.

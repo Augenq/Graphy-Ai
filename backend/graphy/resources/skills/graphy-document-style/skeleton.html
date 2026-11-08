@@ -1,0 +1,44 @@
+<!-- Markup reference for build.mjs: `node "$SKILL/build.mjs" doc.src.html doc.html`. Placeholders only: copy the element you need, write the document's own content, delete the rest. -->
+<h1>[заголовок]</h1>
+
+<h2 id="s1">[заголовок раздела]</h2>
+<p>… $a<b$ … $2{,}5$ …</p>
+<h3>[заголовок подраздела]</h3>
+<h4>[малый заголовок]</h4>
+
+<!-- Environments: span.head prints label and number itself; put (название) inside it or leave it empty. -->
+<div class="definition"><p><span class="head">(…)</span> … <em>…</em> …</p></div>
+<div class="theorem"><p><span class="head"></span> …</p></div>
+<div class="lemma"><p><span class="head"></span> …</p></div>
+<div class="corollary"><p><span class="head"></span> …</p></div>
+<div class="proof"><p><span class="head"></span> …</p></div>
+<div class="example"><p><span class="head">(…)</span> …</p></div>
+<div class="remark"><p><span class="head"></span> …</p></div>
+<div class="note"><p><span class="head" data-label="[метка автора]"></span> …</p></div>
+
+<div class="eq">$$…$$</div>
+<div>$$…$$</div>
+
+<table>
+  <caption>…</caption>
+  <thead><tr><th class="l">…</th><th>…</th><th>…</th></tr></thead>
+  <tbody><tr><td class="l">…</td><td>…</td><td>…</td></tr></tbody>
+</table>
+
+<figure>
+  <svg viewBox="0 0 300 60" width="300" role="img" aria-label="…"><line x1="10" y1="30" x2="290" y2="30" stroke="#000" stroke-width="1.2"/></svg>
+  <figcaption>…</figcaption>
+</figure>
+
+<ol><li>…</li><li>…</li></ol>
+<ol class="alpha"><li>…</li><li>…</li></ol>
+<ul><li>…</li></ul>
+
+<blockquote><p>…</p></blockquote>
+<pre><code>…</code></pre>
+
+<p>…<sup class="fnref"><a id="r1" href="#fn1">1</a></sup></p>
+<div class="footnotes"><ol><li id="fn1">… <a href="#r1">↑</a></li></ol></div>
+
+<!-- Table of contents, only if asked or the document is long: -->
+<nav class="toc"><ol><li><a href="#s1">…</a><ol><li><a href="#s1a">…</a></li></ol></li></ol></nav>

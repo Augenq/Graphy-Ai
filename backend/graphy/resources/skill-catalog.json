@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "_comment": "Skill catalog. See docs/skill-catalog.md. Entries with example:true are placeholders; delete them when shipping real skills.",
+  "skills": [
+    {
+      "id": "example-socratic-tutor",
+      "title": "Пример: Сократовский наставник",
+      "description": "ПРИМЕР. Ведёт ученика вопросами вместо готовых ответов.",
+      "version": "1.0.0",
+      "tags": [
+        "пример",
+        "диалог"
+      ],
+      "example": true,
+      "sha256": "68f5d36fb2fd6e04efa6b90822211ef864bbf0d62951985213ba22c6f5ece455",
+      "body": "---\nname: example-socratic-tutor\ndescription: \"ПРИМЕР. Ведёт ученика вопросами вместо готовых ответов.\"\ntags: пример, диалог\n---\n\n# example-socratic-tutor\n\nПример навыка для проверки каталога. Замените этот текст настоящими инструкциями.\n"
+    },
+    {
+      "id": "example-flashcards",
+      "title": "Пример: Карточки для повторения",
+      "description": "ПРИМЕР. Превращает конспект в карточки для интервального повторения.",
+      "version": "1.0.0",
+      "tags": [
+        "пример",
+        "повторение"
+      ],
+      "example": true,
+      "sha256": "f73fc51b56ca0f570f144e59b7078f139fa7628bd91e8e2737de62d1c8ae208a",
+      "body": "---\nname: example-flashcards\ndescription: \"ПРИМЕР. Превращает конспект в карточки для интервального повторения.\"\ntags: пример, повторение\n---\n\n# example-flashcards\n\nПример навыка для проверки каталога. Замените этот текст настоящими инструкциями.\n"
+    }
+  ]
+}

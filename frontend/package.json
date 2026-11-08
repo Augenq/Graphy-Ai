@@ -1,0 +1,49 @@
+{
+  "name": "graphy-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Graphy learning web application",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:web": "vite",
+    "build": "tsc --noEmit && vite build",
+    "start": "vite preview --host localhost --port 5174",
+    "typecheck": "tsc --noEmit",
+    "test:ui": "node scripts/regression-server.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/roboto": "^5.3.0",
+    "@material/material-color-utilities": "^0.4.0",
+    "@material/web": "^2.5.0",
+    "@maxhub/max-ui": "0.9.1",
+    "@phosphor-icons/react": "^2.1.10",
+    "katex": "^0.19.1",
+    "mammoth": "^1.8.0",
+    "material-symbols": "^0.48.2",
+    "motion": "^14.7.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-markdown": "^10.1.0",
+    "read-excel-file": "^9.3.14",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  },
+  "overrides": {
+    "@maxhub/max-ui": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
+  }
+}

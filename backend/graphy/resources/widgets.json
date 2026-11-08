@@ -1,0 +1,124 @@
+{
+  "TEXT": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 8000,
+    "pattern": "\\S"
+  },
+  "MODULES": [
+    "diagram",
+    "chart",
+    "interactive"
+  ],
+  "MAX_CODE": 60000,
+  "TOOLS": [
+    "visualize_read_me",
+    "show_widget"
+  ],
+  "READ_ME_SCHEMA": {
+    "type": "object",
+    "properties": {
+      "modules": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 3,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "enum": [
+            "diagram",
+            "chart",
+            "interactive"
+          ]
+        }
+      }
+    },
+    "required": [
+      "modules"
+    ],
+    "additionalProperties": false
+  },
+  "SHOW_SCHEMA": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80,
+        "pattern": "\\S",
+        "description": "Short snake_case identifier, e.g. binary_search_steps"
+      },
+      "widget_code": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 60000,
+        "pattern": "\\S"
+      }
+    },
+    "required": [
+      "title",
+      "widget_code"
+    ],
+    "additionalProperties": false
+  },
+  "DESCRIPTIONS": {
+    "visualize_read_me": "Design guidelines for show_widget (colors, SVG classes, Chart.js setup, interaction rules). Call once before your first show_widget in a lesson, silently: never mention this call to the learner. modules: diagram (flows, structures, geometry), chart (data, function plots), interactive (simulations, steppers, small tools); pick all that fit.",
+    "show_widget": "Draw a visual inside the chat: an SVG diagram, a chart, an interactive HTML/JS explainer. Use it when a picture or a manipulable model teaches the idea faster than words. widget_code is an HTML or SVG fragment (no DOCTYPE/html/head/body), only the visual, never explanatory prose: write the explanation in your reply. Needs visualize_read_me read earlier in the lesson. The learner sees the result; you receive only a confirmation."
+  },
+  "DECLARATIONS": [
+    {
+      "name": "visualize_read_me",
+      "description": "Design guidelines for show_widget (colors, SVG classes, Chart.js setup, interaction rules). Call once before your first show_widget in a lesson, silently: never mention this call to the learner. modules: diagram (flows, structures, geometry), chart (data, function plots), interactive (simulations, steppers, small tools); pick all that fit.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "modules": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "diagram",
+                "chart",
+                "interactive"
+              ]
+            }
+          }
+        },
+        "required": [
+          "modules"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "show_widget",
+      "description": "Draw a visual inside the chat: an SVG diagram, a chart, an interactive HTML/JS explainer. Use it when a picture or a manipulable model teaches the idea faster than words. widget_code is an HTML or SVG fragment (no DOCTYPE/html/head/body), only the visual, never explanatory prose: write the explanation in your reply. Needs visualize_read_me read earlier in the lesson. The learner sees the result; you receive only a confirmation.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S",
+            "description": "Short snake_case identifier, e.g. binary_search_steps"
+          },
+          "widget_code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60000,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "title",
+          "widget_code"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+.max-gate { display: flex; min-height: 100%; height: 100%; align-items: center; justify-content: center; padding: 24px 16px; overflow: auto; }
+.max-gate-inner { width: min(560px, 100%); display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.max-gate-brand { font-size: 32px; line-height: 40px; }
+.max-gate-title { margin: 0; font-size: 28px; line-height: 34px; font-weight: 600; }
+.max-gate-text { margin: 0; color: var(--ink-2, inherit); font-size: 15px; line-height: 22px; }
+.max-gate-error { color: var(--error, #c0392b); margin: 0; }
+.max-role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+@media (max-width: 520px) { .max-role-cards { grid-template-columns: 1fr; } }
+.max-role-card { text-align: left; display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 14px; border: 1px solid var(--rule-2, #8884); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.max-role-card:hover:not(:disabled), .max-role-card[data-primary] { border-color: var(--ink, currentColor); }
+.max-role-card:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.max-role-name { font-size: 20px; font-weight: 600; }
+.max-role-desc { font-size: 14px; line-height: 20px; opacity: .75; }
+.max-profile { display: flex; flex-direction: column; gap: 20px; }
+.max-profile-head { display: flex; gap: 16px; align-items: center; }
+.max-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; flex: none; }
+.max-avatar-sm { width: 36px; height: 36px; font-size: 14px; }
+.max-avatar-fallback { display: inline-flex; align-items: center; justify-content: center; background: var(--rule-2, #8883); font-weight: 600; font-size: 24px; text-transform: uppercase; }
+.max-profile-name { font-size: 20px; font-weight: 600; }
+.max-profile-sub, .max-muted { font-size: 13px; line-height: 19px; opacity: .7; }
+.max-profile-role { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--rule-2, #8886); font-size: 13px; }
+.max-block { display: flex; flex-direction: column; gap: 10px; }
+.max-block-title { margin: 8px 0 0; font-size: 15px; font-weight: 600; }
+.max-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.max-list-row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--rule, #8883); }
+.max-list-row:last-child { border-bottom: 0; }
+.max-row-title { font-size: 15px; font-weight: 500; }
+.max-join { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 12px; }
+.max-join > :first-child { flex: 1 1 220px; }
+.max-classes { padding-bottom: 32px; }
+.max-class-card { border: 1px solid var(--rule-2, #8884); border-radius: 14px; padding: 16px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
+.max-class-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+.max-class-title { margin: 0; font-size: 20px; }
+.max-class-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.max-invite { word-break: break-all; user-select: all; }

@@ -1,0 +1,31 @@
+/* Toasts: our host (top layer above dialogs, hover pause, dedupe, live regions) in MAX UI Snackbar's look:
+   #696c70 surface, 16px radius, 12px padding/gap, body-large text, overlay-variant buttons. Plus the `?` info mark. */
+.toast-host, .toast-host[popover] { position: fixed; z-index: 120; inset: auto 16px 16px auto; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; overflow: visible; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+.toast-host:not(:popover-open) { display: none; }
+.toast-region { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; width: 100%; }
+.toast-region:empty { display: none; }
+.toast { --toast-bg: #696c70; --toast-fg: #fff; pointer-events: auto; box-sizing: border-box; width: 100%; max-width: 360px; display: flex; align-items: center; gap: 12px; padding: 12px;
+  border-radius: 16px; color: var(--toast-fg); background: var(--toast-bg);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px 0 rgb(0 0 0 / 0.08), 0 0 2px 0 rgb(0 0 0 / 0.08);
+  animation: toast-in var(--dur-slower, 300ms) var(--ease-out-strong, cubic-bezier(.165, .84, .44, 1)); }
+.toast[data-leaving] { animation: toast-out var(--dur-normal, 150ms) ease-out forwards; pointer-events: none; }
+html[data-theme="light"] .toast, html[data-theme="dark"] .toast { background: var(--toast-bg); }
+html[data-theme="dark"] .toast { --toast-bg: #4a4d52; }
+.toast:is([data-kind="error"], [data-kind="warn"])::before { content: ""; flex: none; align-self: flex-start; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--warn); }
+.toast[data-kind="error"]::before { background: #ff6b6b; }
+.toast-text { flex: 1 1 auto; min-width: 0; margin: 0; padding: 0; font: 400 15px/20px var(--font-sans); overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6; overflow: hidden; }
+.toast:is(:hover, :focus-within) .toast-text { -webkit-line-clamp: unset; line-clamp: unset; }
+.toast .toast-action.toast-action, .toast .toast-close.toast-close { flex: none; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(16px) scale(0.96); } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(8px) scale(0.98); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+.info-mark { position: relative; display: inline-flex; vertical-align: middle; margin-inline-start: 6px; }
+.info-mark .info-mark-btn.info-mark-btn { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; cursor: help; color: var(--ink-3); }
+.info-mark .info-mark-btn.info-mark-btn svg { width: 16px; height: 16px; }
+.info-mark .info-mark-btn.info-mark-btn:is(:hover, [aria-expanded="true"]) { color: var(--ink); background: var(--wash); }
+/* Closed: only a screen-reader copy. Open (hover, focus or pinned, and not dismissed with Esc): a visible bubble. */
+.info-mark-text { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.info-mark[data-open] .info-mark-text { z-index: 95; left: 0; top: calc(100% + 6px); width: max-content; max-width: min(320px, 70vw); height: auto; margin: 0; padding: 8px 12px; border-radius: 8px; overflow: visible; clip: auto; clip-path: none; white-space: normal; pointer-events: none;
+  background: var(--sheet); color: var(--ink); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow-pop); font: 400 13px/18px var(--font-sans); }

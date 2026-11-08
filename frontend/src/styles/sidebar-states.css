@@ -1,0 +1,44 @@
+/* Sidebar lesson states: Pinned / Active / Recent / Finished sections and the unread dot. */
+.unread-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+[data-state-section] { margin-bottom: 4px; }
+.state-section-head { display: flex; align-items: center; gap: 6px; width: 100%; margin: 0; padding: 8px 12px 4px; border: 0; background: none; color: var(--ink-3); font: 500 var(--md-sys-typescale-label-large-size, 14px)/20px var(--font-sans); text-align: left; cursor: pointer; border-radius: var(--r-sm, 8px); }
+.state-section-head:hover { color: var(--ink); }
+.state-section-head:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: -2px; }
+.state-section-count { margin-left: auto; font-size: 12px; font-variant-numeric: tabular-nums; }
+nav[data-sidebar] md-list-item[data-unread] { --md-list-item-label-text-weight: 500; }
+@media (forced-colors: active) { .unread-dot { background: Highlight; forced-color-adjust: none; } }
+
+nav[data-sidebar] .my-chats-head { background: var(--surface-sidebar); }
+.sidebar-recent-title { position: sticky; top: 0; z-index: 2; background: var(--surface-sidebar); }
+
+/* No horizontal scroll in the sidebar.
+   Cause: the tooltip of a control at the right edge («Hide sidebar») is an absolutely positioned label centered on the
+   control and as wide as its text. Invisible (opacity 0) it still counted as scrollable overflow and made the chat list scroll sideways by ~60px.
+   The labels in the sidebar are anchored to the control's right edge and grow inward; the flex and grid ancestors may shrink below their content. */
+nav[data-sidebar] .tip-label { left: auto; right: 0; transform: none; }
+nav[data-sidebar] .scroll-y, nav[data-sidebar] section, nav[data-sidebar] md-list, nav[data-sidebar] .tip { min-width: 0; }
+/* Row text is the list label size (13 on a desktop, which the page zoom shows as ~14 on screen; 16 on a phone), not the 14px of text-base.
+   Desktop rows give the title the width: tighter gap and trailing space, a quieter, narrower time column. A phone keeps its 44px+ targets. */
+nav[data-sidebar] md-list-item [slot="headline"] { font-size: var(--md-list-item-label-text-size, 13px); line-height: var(--md-list-item-label-text-line-height, 20px); }
+@media (min-width: 601px) {
+  html nav[data-sidebar] md-list-item { gap: 6px; --md-list-item-trailing-space: 6px; } /* `html` beats index.css's 10px whatever the load order */
+  nav[data-sidebar] .sidebar-session-meta { gap: 4px; font-size: 11px; line-height: 16px; }
+}
+
+/* The full title of a cut row, shown beside it while it has keyboard focus (data-cut is set on focus; a mouse has the title tooltip) */
+nav[data-sidebar] md-list-item[data-cut]:focus-visible::after { content: attr(title); position: absolute; z-index: 60; left: 8px; top: calc(100% + 2px); width: max-content; max-width: calc(100% - 16px); padding: 6px 10px; border-radius: 6px; background: var(--md-sys-color-inverse-surface); color: var(--md-sys-color-inverse-on-surface); font: 400 12px/16px var(--font-sans); white-space: normal; overflow-wrap: anywhere; pointer-events: none; }
+
+/* Keep the rail mounted during its transition, while removing closed controls from focus. */
+.sidebar-dock { width: var(--sb-w); min-width: 0; overflow: hidden; transition: width 220ms cubic-bezier(.2, 0, 0, 1); }
+.sidebar-dock[data-open="false"] { width: 0; }
+.sidebar-dock-inner { width: var(--sb-w); height: 100%; transform: translateX(0); opacity: 1; transition: transform 220ms cubic-bezier(.2, 0, 0, 1), opacity 160ms ease; }
+.sidebar-dock[data-open="false"] .sidebar-dock-inner { transform: translateX(-24px); opacity: 0; }
+.sidebar-overlay-layer { position: absolute; inset: 0; z-index: 30; visibility: visible; transition: visibility 0s; }
+.sidebar-overlay-layer[data-open="false"] { visibility: hidden; pointer-events: none; transition: visibility 0s 220ms; }
+.sidebar-backdrop { opacity: 1; transition: opacity 220ms ease; }
+.sidebar-overlay { transform: translateX(0); transition: transform 220ms cubic-bezier(.2, 0, 0, 1); }
+.sidebar-overlay-layer[data-open="false"] .sidebar-backdrop { opacity: 0; }
+.sidebar-overlay-layer[data-open="false"] .sidebar-overlay { transform: translateX(-100%); }
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-dock, .sidebar-dock-inner, .sidebar-overlay-layer, .sidebar-backdrop, .sidebar-overlay { transition: none; }
+}

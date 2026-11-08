@@ -1,0 +1,20 @@
+/* The frame reports its own height in its own pixel coordinate system. */
+.widget-visual { min-width: 0; width: 100%; }
+.widget-frame { max-width: 100%; }
+.widget-svg { display: block; width: 100%; height: auto; }
+.widget-inline-scroll { overflow: auto; min-width: 0; overscroll-behavior-x: contain; }
+.widget-toolbar { align-items: center; gap: 2px; }
+.widget-toolbar { display: flex; justify-content: flex-end; margin-top: 4px; }
+.graphy-dialog.dialog-visual { width: min(1100px, calc(100 * var(--app-vw) - 32px)); height: min(800px, calc(100 * var(--app-dvh) - 48px)); }
+.dialog-visual .graphy-dialog-content { height: 100%; min-height: 0; overflow: hidden; }
+.widget-viewer { display: flex; flex-direction: column; background: var(--paper); color: var(--ink); }
+.widget-viewer-header { display: flex; flex-shrink: 0; align-items: center; gap: 4px; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+.widget-viewer-header h2 { flex: 1; min-width: 0; font-size: 18px; font-weight: 500; }
+.widget-viewer-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 16px; }
+.widget-viewer-content { min-width: 100%; }
+@media (max-width: 600px) {
+  .graphy-dialog.dialog-visual { width: 100vw; max-width: 100vw; height: var(--mobile-viewport-height, calc(100 * var(--app-dvh))); max-height: var(--mobile-viewport-height, calc(100 * var(--app-dvh))); margin: 0; --md-dialog-container-shape: 0px; }
+  .widget-viewer { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  .widget-viewer-header { min-height: 64px; padding-inline: 12px; }
+  .widget-viewer-scroll { padding: 16px; }
+}

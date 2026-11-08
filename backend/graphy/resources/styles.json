@@ -1,0 +1,36 @@
+{
+  "DEFAULT_STYLE": "structured_reference",
+  "EXPLANATION_STYLES": [
+    "structured_reference",
+    "socratic"
+  ],
+  "STYLE_HEADING": "# EXPLANATION STYLE:",
+  "DEPTHS": {
+    "adaptive": "",
+    "brief": "Depth: keep the answer compact; include the essential reason and conditions. Expand only when needed for correctness or explicitly requested.",
+    "detailed": "Depth: explain the requested idea thoroughly: develop difficult transitions, conditions and useful examples so the learner can follow the reasoning. Expand within the requested scope, and respect a request for a short answer or to work one step at a time."
+  },
+  "PRESENTATIONS": {
+    "adaptive": "",
+    "prose": "Presentation: develop the explanation in connected paragraphs, with at most one topic heading. Avoid subsection headings and routine bullet lists; keep necessary formulas readable.",
+    "structured": "Presentation: separate a multi-part explanation into short, descriptively named sections for its distinct functions (such as the idea, reasoning or example, and practice). A single title over uninterrupted prose is not this layout. Use lists for independent items and tables for real comparisons. Short answers need no sections."
+  },
+  "PREFERENCES": {
+    "explanation_depth": [
+      "Depth:",
+      {
+        "adaptive": "",
+        "brief": "Depth: keep the answer compact; include the essential reason and conditions. Expand only when needed for correctness or explicitly requested.",
+        "detailed": "Depth: explain the requested idea thoroughly: develop difficult transitions, conditions and useful examples so the learner can follow the reasoning. Expand within the requested scope, and respect a request for a short answer or to work one step at a time."
+      }
+    ],
+    "explanation_presentation": [
+      "Presentation:",
+      {
+        "adaptive": "",
+        "prose": "Presentation: develop the explanation in connected paragraphs, with at most one topic heading. Avoid subsection headings and routine bullet lists; keep necessary formulas readable.",
+        "structured": "Presentation: separate a multi-part explanation into short, descriptively named sections for its distinct functions (such as the idea, reasoning or example, and practice). A single title over uninterrupted prose is not this layout. Use lists for independent items and tables for real comparisons. Short answers need no sections."
+      }
+    ]
+  }
+}

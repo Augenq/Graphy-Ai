@@ -1,0 +1,6 @@
+Fonts in fonts/ (subsets: Latin, Cyrillic, punctuation, math):
+- CMUSerif-*.woff2, CMUTypewriter-Regular.woff2: Computer Modern Unicode (CMU), SIL Open Font License 1.1.
+  Copyright (c) Andrey V. Panov. https://cm-unicode.sourceforge.io/
+- LatinModernMath.woff2: Latin Modern Math, GUST Font License (LPPL-based), free to use, embed and redistribute.
+  Copyright (c) B. Jackowski, J. M. Nowacki and others (GUST e-foundry).
+katex.min.cjs: KaTeX 0.19.1, MIT License (see KATEX-LICENSE.txt).

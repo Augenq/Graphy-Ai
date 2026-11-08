@@ -1,0 +1,13 @@
+import crypto from 'node:crypto'; import fs from 'node:fs';
+const BASE='http://localhost:5191', TOKEN='fake:token';
+const sign = (fields) => { const launch = Object.entries(fields).sort(([a],[b])=>a<b?-1:1).map(([k,v])=>`${k}=${v}`).join('\n');
+  const secret = crypto.createHmac('sha256','WebAppData').update(TOKEN).digest();
+  return new URLSearchParams({...fields, hash: crypto.createHmac('sha256',secret).update(launch).digest('hex')}).toString(); };
+const api = async (m, p, tok, body) => { const r = await fetch(BASE+p,{method:m,headers:{'content-type':'application/json',...(tok?{authorization:'Bearer '+tok}:{})},body:body?JSON.stringify(body):undefined}); const j = await r.json().catch(()=>({})); if(!r.ok) throw new Error(m+' '+p+' '+r.status+' '+JSON.stringify(j)); return j; };
+const login = async (id, first, last) => (await api('POST','/hub/auth',null,{initData:sign({auth_date:Math.floor(Date.now()/1000),user:JSON.stringify({id:+id,first_name:first,last_name:last})})})).token;
+const T = await login(9001,'Анна','Петровна'), S1 = await login(9002,'Иван','Сидоров'), S2 = await login(9003,'Мария','Иванова');
+await api('PUT','/hub/role',T,{role:'teacher'}); await api('PUT','/hub/role',S1,{role:'student'}); await api('PUT','/hub/role',S2,{role:'student'});
+const cls = await api('POST','/hub/classes',T,{title:'5А математика'}); const code = (cls.class||cls).code;
+await api('POST','/hub/join',S1,{code}); await api('POST','/hub/join',S2,{code});
+fs.writeFileSync('tokens.json', JSON.stringify({T,S1,S2,code}));
+console.log('ok', code);

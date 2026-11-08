@@ -1,0 +1,11 @@
+**
+!Dockerfile
+!requirements.lock
+!rust/
+!rust/Cargo.toml
+!rust/Cargo.lock
+!rust/src/
+!rust/src/**
+rust/target/
+
+rust/target/

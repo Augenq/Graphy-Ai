@@ -1,0 +1,36 @@
+/* Graphy slide deck (build.mjs --slides): 16:9 sections, Computer Modern, black on white. Sizes in cqw so a slide scales with its width
+   (screen and print look the same). Print: one slide per 13.333 x 7.5 in page. */
+html { background: var(--desk); }
+body { background: transparent; }
+.deck { margin: 0 auto; padding: 16px 0; max-width: 1280px; counter-reset: slide 0 eq 0 fig 0; }
+.deck > section {
+  container-type: inline-size; box-sizing: border-box; position: relative; overflow: hidden;
+  width: 100%; aspect-ratio: 16 / 9; margin: 0 0 16px; padding: 5cqw 6cqw 4cqw; background: #fff; color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2), 0 0 0 1px rgba(0, 0, 0, .05);
+  display: flex; flex-direction: column; justify-content: flex-start; counter-increment: slide;
+  text-align: left; hyphens: manual; font-size: 2.5cqw; line-height: 1.3;
+}
+.deck > section::after { content: counter(slide); position: absolute; right: 2.4cqw; bottom: 1.6cqw; font-size: 1.6cqw; color: var(--ink-3); }
+.deck > section.title { justify-content: center; }
+.deck > section.title::after { content: none; }
+.deck h1 { font-size: 6cqw; line-height: 1.1; margin: 0 0 2cqw; font-weight: 700; }
+.deck h2 { font-size: 4.2cqw; line-height: 1.15; margin: 0 0 3cqw; font-weight: 700; padding-bottom: 1.2cqw; border-bottom: .15cqw solid var(--rule); }
+.deck h3 { font-size: 3cqw; margin: 0 0 1.2cqw; font-weight: 700; }
+.deck p { margin: 0 0 1.6cqw; text-indent: 0; }
+.deck ul, .deck ol { margin: 0 0 1.6cqw; padding-left: 3.2cqw; }
+.deck li { margin: 0 0 1cqw; }
+.deck .big { font-size: 4.2cqw; text-align: center; margin: auto 0; }
+.deck .display { text-align: center; margin: 1.6cqw 0; font-size: 1.15em; }
+.deck .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4cqw; align-items: start; }
+.deck .note { font-size: .8em; }
+.deck table { margin: 1cqw auto; font-size: .9em; }
+.deck svg { max-width: 100%; height: auto; }
+.deck .eq { margin: 1.6cqw 0; }
+@media (max-width: 700px) { .deck { padding: 0; } .deck > section { margin-bottom: 8px; box-shadow: none; } }
+@page { size: 13.333in 7.5in; margin: 0; }
+@media print {
+  html, body { background: #fff; }
+  .deck { max-width: none; padding: 0; }
+  .deck > section { width: 13.333in; height: 7.5in; aspect-ratio: auto; margin: 0; box-shadow: none; break-after: page; break-inside: avoid; }
+  .deck > section:last-child { break-after: auto; }
+}

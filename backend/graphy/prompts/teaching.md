@@ -1,0 +1,1 @@
+Develop the current topic and its difficult connection. A follow-up addresses the new difficulty without repeating the introduction; a request for a complete solution follows the current request within the stated limits.

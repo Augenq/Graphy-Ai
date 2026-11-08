@@ -1,0 +1,50 @@
+/* Message action row (task D). Values measured in Cursor (report-cursor.md): buttons 24x24 r6, gap 2, colour .52 alpha,
+   hover bg .08 / colour .66, pressed scale .98, colour+bg 100ms, transform 50ms; visible without hover on the last turn.
+   The time label has no measured size: 12px (the UI meta size) is the nearest token. */
+.msg-actions {
+  display: flex; align-items: center; gap: 2px;
+  margin: 8px 0 0 -4px;
+  opacity: 0;
+  transition: opacity var(--dur-normal, 150ms) linear;
+}
+.msg-actions[data-last], .group\/msg:hover .msg-actions, .msg-actions:focus-within { opacity: 1; }
+@media (hover: none) { .msg-actions { opacity: 1; } }
+
+.msg-act {
+  position: relative;
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px; padding: 0; border: 0; border-radius: 6px;
+  background: transparent; cursor: pointer;
+  color: color-mix(in srgb, var(--ink) 52%, transparent);
+  transition: color var(--dur-fast, 100ms) var(--ease-default, ease), background-color var(--dur-fast, 100ms) var(--ease-default, ease), transform var(--dur-instant, 50ms) var(--ease-default, ease);
+}
+.msg-act md-icon { --md-icon-size: 16px; font-size: 16px; width: 16px; height: 16px; }
+.msg-act:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: color-mix(in srgb, var(--ink) 66%, transparent); }
+.msg-act:active { transform: scale(var(--press-scale, .98)); }
+.msg-act:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (pointer: coarse) { .msg-act::after { content: ""; position: absolute; inset: -10px; } }
+
+/* DEVIATION from the measured .52 alpha: that is ~3.4:1 on the light page; the labels use --ink-2 to reach AA 4.5:1 (buttons keep .52, they are icons) */
+.msg-time { margin-left: 6px; font-size: 12px; line-height: 16px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* The code block header sits in a bar: the copy icon is flush right */
+.chrome .msg-act { margin-right: -6px; }
+
+/* Sources of the answer: folded, one quiet line */
+.msg-sources { margin-top: 8px; }
+.msg-sources-toggle {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px; margin-left: -4px; border: 0; border-radius: 6px; background: transparent; cursor: pointer;
+  font: inherit; font-size: 12px; line-height: 18px; color: color-mix(in srgb, var(--ink) 66%, transparent);
+  transition: color var(--dur-fast, 100ms) ease, background-color var(--dur-fast, 100ms) ease;
+}
+.msg-sources-toggle:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.msg-sources-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.msg-sources-count { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.msg-sources-chev { width: 10px; height: 10px; transition: transform var(--dur-normal, 150ms) ease; }
+.msg-sources-toggle[aria-expanded="true"] .msg-sources-chev { transform: rotate(90deg); }
+.msg-sources-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.msg-sources-list a { display: flex; align-items: baseline; gap: 8px; padding: 2px 4px; margin-left: -4px; border-radius: 6px; font-size: 12px; line-height: 18px; color: var(--ink-2); text-decoration: none; }
+.msg-sources-list a:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); }
+.msg-sources-n { flex: none; min-width: 16px; text-align: center; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.msg-sources-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .msg-actions, .msg-act, .msg-sources-chev { transition: none; } }

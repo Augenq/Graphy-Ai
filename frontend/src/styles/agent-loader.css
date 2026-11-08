@@ -1,0 +1,146 @@
+/* Animated agent/network loader. No logo. Uses theme ink/accent roles so it works in light & dark. */
+.agent-loader {
+  --al-ink: var(--ink, #1f1f1f);
+  --al-accent: var(--accent, var(--ink, #1f1f1f));
+  --al-mid: color-mix(in srgb, var(--al-accent) 30%, transparent);
+  --al-soft: color-mix(in srgb, var(--al-accent) 11%, transparent);
+  --al-glow: color-mix(in srgb, var(--al-accent) 18%, transparent);
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.agent-loader-svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.al-orb { fill: none; stroke: var(--al-soft); stroke-width: 1; }
+.al-orb-a {
+  stroke: var(--al-mid);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 10 28 4 40;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-spin 7s linear infinite;
+}
+.al-orb-b {
+  stroke-dasharray: 3 11;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-spin-r 11s linear infinite;
+}
+.al-link {
+  stroke: var(--al-mid);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: al-link 2.4s ease-in-out infinite;
+}
+.al-wave {
+  fill: none;
+  stroke: var(--al-accent);
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-wave 2.8s cubic-bezier(.2,.6,.2,1) infinite;
+}
+.al-node {
+  fill: var(--al-accent);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-node 1.8s ease-in-out infinite;
+}
+.al-halo {
+  fill: var(--al-glow);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-halo 1.8s ease-in-out infinite;
+}
+.al-core {
+  fill: var(--al-accent);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-core 1.6s ease-in-out infinite;
+}
+.al-core-ring {
+  fill: none;
+  stroke: var(--al-accent);
+  stroke-width: 1.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: al-core-r 1.6s ease-in-out infinite;
+}
+.al-trav {
+  fill: var(--al-accent);
+  opacity: 0;
+  animation-name: al-trav;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes al-spin { to { transform: rotate(360deg); } }
+@keyframes al-spin-r { to { transform: rotate(-360deg); } }
+@keyframes al-link { 0%,100% { opacity: .08; } 35%,65% { opacity: .55; } }
+@keyframes al-wave { 0% { transform: scale(.12); opacity: .55; stroke-width: 2; } 100% { transform: scale(7.8); opacity: 0; stroke-width: .5; } }
+@keyframes al-node { 0%,100% { transform: scale(.85); opacity: .45; } 50% { transform: scale(1.25); opacity: 1; } }
+@keyframes al-halo { 0%,100% { transform: scale(.6); opacity: 0; } 50% { transform: scale(1.9); opacity: .5; } }
+@keyframes al-core { 0%,100% { transform: scale(.88); } 50% { transform: scale(1.15); } }
+@keyframes al-core-r { 0%,100% { transform: scale(.9); opacity: .45; } 50% { transform: scale(1.45); opacity: 0; } }
+@keyframes al-trav {
+  0% { transform: translate(0,0); opacity: 0; }
+  10% { opacity: .9; }
+  90% { opacity: .9; }
+  100% { transform: translate(var(--tx, 0), var(--ty, 0)); opacity: 0; }
+}
+
+/* Agent boot gate (ConnectionGate). */
+.agent-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  width: min(520px, 100%);
+  padding: 24px;
+  animation: agent-gate-in 260ms cubic-bezier(.2, 0, 0, 1) both;
+}
+.agent-gate-brand { font-size: 34px; line-height: 40px; margin-top: 2px; }
+.agent-gate-status {
+  margin: 0;
+  color: var(--ink-2);
+  font: 400 14px/20px var(--font-sans, Roboto, sans-serif);
+  min-height: 20px;
+  animation: agent-gate-fade 360ms ease both;
+}
+.agent-gate-fail { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 4px; max-width: 100%; }
+.agent-gate-title { margin: 0; font: 500 20px/28px var(--font-sans, Roboto, sans-serif); color: var(--ink); }
+.agent-gate-detail { margin: 0; color: var(--ink-2); font: 400 14px/20px var(--font-sans, Roboto, sans-serif); white-space: pre-wrap; }
+.max-role-busy { display: grid; place-items: center; margin-top: 4px; }
+
+/* Crossfade: gate fades out over the workspace so layout never "jumps in". */
+.agent-gate-out {
+  position: fixed !important;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  animation: agent-gate-out 260ms cubic-bezier(.2, 0, 0, 1) both;
+}
+.workspace-handoff[data-ready="false"] { visibility: hidden; }
+.workspace-handoff[data-ready="true"] { visibility: visible; }
+/* Suppress layout transitions while computing the stable first frame. */
+.workspace-handoff[data-ready="false"] .sidebar-dock,
+.workspace-handoff[data-ready="false"] .sidebar-dock-inner,
+.workspace-handoff[data-ready="false"] .lesson-panel,
+.workspace-handoff[data-ready="false"] .lesson-panel > * {
+  transition: none !important;
+}
+
+@keyframes agent-gate-in { from { opacity: 0; transform: translateY(6px) scale(.985); } }
+@keyframes agent-gate-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes agent-gate-out { from { opacity: 1; } to { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .al-orb-a, .al-orb-b, .al-link, .al-wave, .al-node, .al-halo, .al-core, .al-core-ring, .al-trav,
+  .agent-gate, .agent-gate-status, .agent-gate-out { animation: none !important; }
+  .workspace-handoff, .workspace-handoff[data-ready="true"] { transition: none !important; opacity: 1; }
+  .al-link { opacity: .35; }
+  .al-wave, .al-trav { display: none; }
+}

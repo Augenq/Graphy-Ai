@@ -1,0 +1,83 @@
+/* Strategy memory («Память»): switches, strategy card with history, observation list. Tokens from index.css. */
+.memory-view { position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 0 12px; width: 100%; box-sizing: border-box; }
+.memory-head { margin-top: -6px; padding: 4px 0 16px; }
+.memory-sub { margin: 0; color: var(--ink-2); max-width: 64ch; }
+.memory-scroll { flex: 1; min-height: 0; overflow: auto; padding: 0 2px 32px; display: flex; flex-direction: column; gap: 16px; max-width: 860px; }
+.memory-muted { color: var(--ink-2); font: 400 13px/19px var(--font-sans); }
+.memory-fine { margin: 0; }
+.memory-loading { display: flex; align-items: center; gap: 8px; color: var(--ink-2); }
+.memory-error, .memory-note { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-radius: var(--r-lg); }
+.memory-error { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+.memory-error span { flex: 1; }
+.memory-note { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); padding-block: 10px; }
+
+.memory-card { padding: 16px; border: 1px solid var(--rule); border-radius: var(--r-lg); background: var(--sheet); color: var(--ink); display: flex; flex-direction: column; gap: 12px; }
+.memory-card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.memory-card-head h2 { margin: 0; font: 500 18px/24px var(--font-sans); flex: 1; min-width: 0; }
+.memory-card-head md-icon { color: var(--accent); }
+.memory-version { padding: 0 8px; border-radius: 8px; background: var(--wash); color: var(--ink-2); font: 500 12px/20px var(--font-sans); }
+.memory-flag { padding: 0 8px; border-radius: 8px; font: 500 11px/20px var(--font-sans); background: var(--wash); color: var(--ink-2); white-space: nowrap; }
+.memory-flag[data-kind=off], .memory-flag[data-kind=edited] { background: var(--warn-wash); color: var(--md-sys-color-on-tertiary-container); }
+.memory-flag[data-kind=current] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.memory-strategy[data-state=off] { border-style: dashed; }
+
+.memory-profile { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin: 0; }
+.memory-profile > div { padding: 10px 12px; border-radius: var(--r-md); background: var(--wash); min-width: 0; }
+.memory-profile dt { color: var(--ink-2); font: 500 12px/16px var(--font-sans); }
+.memory-profile dd { margin: 2px 0 0; font: 500 15px/22px var(--font-sans); overflow-wrap: anywhere; }
+.memory-reason { display: flex; gap: 8px; align-items: flex-start; margin: 0; color: var(--ink); font: 400 14px/21px var(--font-sans); }
+.memory-reason md-icon { --md-icon-size: 18px; color: var(--ink-2); margin-top: 1px; }
+.memory-toggle { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 6px 10px 6px 6px; border-radius: 16px; cursor: pointer; color: var(--accent); font: 500 14px/20px var(--font-sans); }
+.memory-toggle:hover { background: var(--wash); }
+.memory-toggle:focus-visible, .memory-icon:focus-visible { outline: 3px solid var(--focus-indicator); outline-offset: 2px; }
+.memory-history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.memory-history li { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: var(--r-md); background: var(--wash); }
+.memory-history-main { min-width: 0; }
+.memory-history-main p { margin: 2px 0 0; font: 400 14px/20px var(--font-sans); overflow-wrap: anywhere; }
+.memory-history-main p.memory-muted { font-size: 12px; line-height: 17px; }
+
+.memory-switch { display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; }
+.memory-switch > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.memory-switch + .memory-switch { border-top: 1px solid var(--rule); padding-top: 12px; }
+
+.memory-list-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.memory-list-head h2 { margin: 0; flex: 1 1 160px; font: 500 18px/24px var(--font-sans); }
+.memory-count { margin-inline-start: 6px; padding: 0 6px; border-radius: 10px; background: var(--wash); color: var(--ink-2); font: 500 12px/18px var(--font-sans); }
+.memory-group { display: flex; flex-direction: column; gap: 8px; }
+.memory-group h3 { margin: 0; font: 500 14px/20px var(--font-sans); color: var(--ink-2); }
+.memory-obs-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.memory-obs { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--rule); border-radius: var(--r-lg); background: var(--sheet); }
+.memory-obs[data-status=edited] { opacity: .8; }
+.memory-obs-icon { flex: none; --md-icon-size: 22px; margin-top: 1px; color: var(--ink-2); }
+.memory-obs[data-outcome=independent] .memory-obs-icon { color: var(--md-sys-color-primary); }
+.memory-obs[data-outcome=gap] .memory-obs-icon { color: var(--md-sys-color-tertiary); }
+.memory-obs-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.memory-obs-text { margin: 0; font: 400 14px/21px var(--font-sans); overflow-wrap: anywhere; }
+.memory-obs-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.memory-obs-meta:empty { display: none; }
+.memory-tag { padding: 0 8px; border: 1px solid var(--rule); border-radius: 8px; font: 400 12px/20px var(--font-sans); color: var(--ink-2); }
+.memory-obs-actions { flex: none; display: flex; align-items: center; gap: 2px; }
+.memory-icon { all: unset; box-sizing: border-box; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 18px; cursor: pointer; color: var(--ink-2); }
+.memory-icon:hover:not(:disabled) { background: var(--wash); color: var(--ink); }
+.memory-icon:disabled { opacity: .4; cursor: default; }
+.memory-confirm { display: inline-flex; gap: 2px; align-items: center; }
+.memory-edit { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.memory-edit-text { flex: 1 1 260px; min-width: 0; }
+.memory-select { min-height: 40px; padding: 0 10px; border: 1px solid var(--control); border-radius: var(--r-md); background: var(--sheet); color: var(--ink); font: 400 14px var(--font-sans); }
+.memory-why { padding: 10px 12px; border-radius: var(--r-md); background: var(--wash); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.memory-why p { margin: 0; font: 400 13px/19px var(--font-sans); color: var(--ink-2); }
+
+.memory-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; margin: 24px auto; max-width: 440px; color: var(--ink-2); }
+.memory-empty > md-icon { --md-icon-size: 40px; width: 72px; height: 72px; display: grid; place-items: center; border-radius: 24px; background: var(--wash); color: var(--accent); }
+.memory-empty h3 { margin: 0; color: var(--ink); font: 500 16px/24px var(--font-sans); }
+.memory-empty p { margin: 0; }
+
+@media (max-width: 560px) {
+  .memory-obs { flex-wrap: wrap; }
+  .memory-obs-actions { width: 100%; justify-content: flex-end; }
+  .memory-history li { flex-direction: column; }
+}
+.memory-history-main strong { margin-inline-end: 8px; }
+
+.settings-embedded .memory-view { height: auto; padding: 0; }
+.settings-embedded .memory-scroll { flex: none; overflow: visible; padding: 0; }

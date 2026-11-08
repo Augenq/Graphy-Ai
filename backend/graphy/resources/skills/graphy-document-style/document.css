@@ -1,0 +1,147 @@
+/* Graphy document style: "Russian classic" (Computer Modern 12/15, black on white, hairline rules).
+   Self-contained: build.mjs prepends the @font-face block (fonts embedded as data: URIs). */
+
+:root { color-scheme: light; --ink: #000; --ink-2: #404040; --ink-3: #737373; --rule: #000; --hair: #d9d9d9; --desk: #ebebe8; }
+
+html { background: var(--desk); color: var(--ink); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: transparent; color: var(--ink);
+  font-family: "Graphy CM", "CMU Serif", "Latin Modern Roman", "Computer Modern", "Times New Roman", serif;
+  font-size: 17px; line-height: 1.28; font-kerning: normal; font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility; font-synthesis: none;
+}
+
+/* ---- the sheet: a page on the desk (screen), plain text block (print) ---- */
+.doc {
+  box-sizing: border-box; max-width: 41em; margin: 24px auto; padding: 3.2em 3em 3.6em; background: #fff; color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2), 0 0 0 1px rgba(0, 0, 0, .05);
+  text-align: justify; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; counter-reset: sec 0 sub 0 thm 0 ex 0 fig 0 tab 0 eq 0 task 0 fn 0;
+}
+@media (max-width: 44em) { .doc { margin: 0; padding: 1.6em 1.25em 2.4em; box-shadow: none; } html { background: #fff; } }
+
+p { margin: 0; text-indent: 1.5em; orphans: 2; widows: 2; }
+.noindent, .display + p, .eq + p, figure + p, table + p, .head-block + p { text-indent: 0; }
+.doc > :first-child { margin-top: 0; }
+a { color: inherit; text-decoration: none; }
+a[href^="http"] { text-decoration: underline; text-decoration-thickness: .05em; text-underline-offset: .15em; }
+strong, b { font-weight: 700; } em, i { font-style: italic; }
+small, .small { font-size: .875em; line-height: 1.24; }
+::selection { background: #d8d8d8; }
+
+/* ---- headings: title, 1. section, 1.1. subsection (all bold, black, no colour) ---- */
+h1, h2, h3, h4 { font-weight: 700; text-align: left; hyphens: manual; -webkit-hyphens: manual; break-after: avoid; page-break-after: avoid; }
+h1 { font-size: 2.07em; line-height: 1.2; margin: 0 0 .7em; }
+h2 { font-size: 1.43em; line-height: 1.22; margin: 1.75em 0 .8em; counter-increment: sec; counter-reset: sub thm ex fig tab eq task; }
+h2::before { content: counter(sec) ".\2002"; }
+h3 { font-size: 1.2em; line-height: 1.25; margin: 1.5em 0 .6em; counter-increment: sub; }
+h3::before { content: counter(sec) "." counter(sub) ".\2002"; }
+h4 { font-size: 1em; margin: 1.1em 0 .3em; }
+h2.nonum::before, h3.nonum::before, .flat h2::before, .flat h3::before { content: none; }
+.flat h2, .flat h3 { counter-increment: none; }
+h3.plain { counter-increment: none; font-size: 1em; margin: 1.6em 0 .5em; } h3.plain::before { content: none; }
+
+/* ---- environments: bold run-in head, theorem/lemma italic body, definition/remark/example upright ---- */
+.theorem, .lemma, .corollary, .proposition, .definition, .remark, .example, .note, .proof { margin: .8em 0; }
+.theorem, .lemma, .corollary, .proposition, .definition, .remark { counter-increment: thm; }
+.example { counter-increment: ex; }
+.theorem, .lemma, .corollary, .proposition { font-style: italic; }
+.theorem em, .lemma em, .corollary em, .proposition em, .theorem i, .lemma i { font-style: normal; }
+.theorem, .lemma, .corollary, .proposition, .definition, .example { break-inside: avoid; page-break-inside: avoid; }
+.theorem > :first-child, .lemma > :first-child, .corollary > :first-child, .proposition > :first-child, .definition > :first-child,
+.remark > :first-child, .example > :first-child, .note > :first-child, .proof > :first-child { text-indent: 0; }
+.head { font-style: normal; font-weight: 700; }
+.head::before { margin-right: .3em; }
+.head:empty::before { margin-right: 0; }
+.head::after { content: "."; }
+.theorem .head::before { content: "Теорема " counter(sec) "." counter(thm); }
+.lemma .head::before { content: "Лемма " counter(sec) "." counter(thm); }
+.corollary .head::before { content: "Следствие " counter(sec) "." counter(thm); }
+.proposition .head::before { content: "Предложение " counter(sec) "." counter(thm); }
+.definition .head::before { content: "Определение " counter(sec) "." counter(thm); }
+.remark .head::before { content: "Замечание " counter(sec) "." counter(thm); }
+.example .head::before { content: "Пример " counter(sec) "." counter(ex); }
+.flat .theorem .head::before { content: "Теорема " counter(thm); }
+.flat .lemma .head::before { content: "Лемма " counter(thm); }
+.flat .corollary .head::before { content: "Следствие " counter(thm); }
+.flat .proposition .head::before { content: "Предложение " counter(thm); }
+.flat .definition .head::before { content: "Определение " counter(thm); }
+.flat .remark .head::before { content: "Замечание " counter(thm); }
+.flat .example .head::before { content: "Пример " counter(ex); }
+/* head with a title: <span class="head">(модуль числа)</span> prints "Определение 1.1 (модуль числа)." */
+
+.example::after { content: "\25CA"; display: block; text-align: right; line-height: 1; margin-top: .1em; font-weight: 400; }
+.proof .head { font-weight: 400; font-style: italic; }
+.proof .head::before { content: "Доказательство"; }
+.proof > :last-child::after { content: "\2060\00a0\00a0\25A1"; font-style: normal; }
+/* ruled aside: <div class="note"><p><span class="head" data-label="(author's label)"></span> ... ; label text comes from the author, none by default */
+.note { padding: .45em 0 .5em; margin: 1em 0; border-top: .5pt solid var(--rule); border-bottom: .5pt solid var(--rule); break-inside: avoid; }
+.note .head { font-style: italic; } .note .head::before { content: attr(data-label); }
+.note .head:not([data-label])::after { content: none; }
+
+/* ---- lists ---- */
+ul, ol { margin: .45em 0; padding-left: 2.2em; text-align: justify; }
+li { margin: 0; padding-left: .1em; } li + li { margin-top: .12em; } li > p { text-indent: 0; }
+@counter-style rualpha { system: alphabetic; symbols: "а" "б" "в" "г" "д" "е" "ж" "з" "и" "к" "л" "м" "н" "о" "п" "р" "с" "т" "у" "ф"; }
+ol.alpha { list-style: none; counter-reset: li; } ol.alpha > li { counter-increment: li; position: relative; } ol.alpha > li::before { content: counter(li, rualpha) ")"; position: absolute; left: -1.35em; }
+ul { list-style: none; } ul > li { position: relative; } ul > li::before { content: "\2022"; position: absolute; left: -1.1em; }
+.theorem li { font-style: italic; }
+
+/* ---- display math, equation numbers ---- */
+math { font-family: "Graphy Math", "Latin Modern Math", "STIX Two Math", "Cambria Math", math; font-size: 1em; text-indent: 0; }
+.katex { text-indent: 0; }
+.display { display: block; margin: .65em 0; text-align: center; text-indent: 0; overflow-x: auto; overflow-y: hidden; break-inside: avoid; }
+.eq { display: grid; grid-template-columns: 1fr auto; align-items: center; counter-increment: eq; margin: .65em 0; text-indent: 0; }
+.eq .display { margin: 0; grid-column: 1; }
+.eq::after { content: "(" counter(sec) "." counter(eq) ")"; grid-column: 2; padding-left: 1em; }
+.flat .eq::after { content: "(" counter(eq) ")"; }
+
+/* ---- tables (booktabs: heavy top and bottom rule, light header rule, no verticals) ---- */
+table { border-collapse: collapse; margin: .9em auto; font-size: .96em; text-align: center; border-top: .09em solid var(--rule); border-bottom: .09em solid var(--rule); break-inside: avoid; }
+thead th { font-weight: 400; border-bottom: .05em solid var(--rule); }
+th, td { padding: .22em .9em; text-indent: 0; line-height: 1.25; } th { font-weight: 700; } thead th { font-weight: 400; }
+td.l, th.l, table.left td, table.left th { text-align: left; } td.r, th.r { text-align: right; }
+tbody tr + tr td { border-top: 0; }
+table.rules tbody tr + tr td { border-top: .03em solid var(--hair); }
+caption { caption-side: top; font-size: .875em; line-height: 1.24; padding: 0 0 .5em; text-align: left; counter-increment: tab; }
+caption::before { content: "Таблица " counter(sec) "." counter(tab) ". "; font-weight: 700; }
+.flat caption::before { content: "Таблица " counter(tab) ". "; }
+
+/* ---- figures: black and grey only, caption below, small ---- */
+figure { margin: 1.1em 0; text-align: center; text-indent: 0; break-inside: avoid; }
+figure img, figure svg { max-width: 100%; height: auto; }
+figure svg text { font-family: "Graphy CM", "CMU Serif", serif; }
+figcaption { margin: .6em 1.5em 0; font-size: .875em; line-height: 1.24; text-align: justify; counter-increment: fig; }
+figcaption::before { content: "Рис. " counter(sec) "." counter(fig) ". "; font-weight: 700; }
+.flat figcaption::before { content: "Рис. " counter(fig) ". "; }
+
+/* ---- footnotes (no JS: <sup class="fnref"><a href="#fn1">1</a></sup>, list at the end) ---- */
+.fnref { font-size: .72em; line-height: 0; vertical-align: super; text-indent: 0; }
+.footnotes { margin-top: 2.2em; padding-top: .5em; border-top: .5pt solid var(--rule); width: 33%; min-width: 12em; font-size: .875em; line-height: 1.24; }
+.footnotes ol { margin: 0; padding-left: 1.5em; } .footnotes li { padding-left: 0; }
+@media (max-width: 44em) { .footnotes { width: 100%; } }
+
+/* ---- table of contents: only for long documents ---- */
+.toc { margin: 1.2em 0 2em; text-align: left; } .toc > h2 { margin-top: 0; } .toc > h2::before { content: none; }
+.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; } .toc li { counter-increment: t; margin: .2em 0; padding: 0; } .toc li::before { content: counter(t) ".\2003"; position: static; }
+.toc ol ol { counter-reset: u; padding-left: 2em; } .toc ol ol li { counter-increment: u; } .toc ol ol li::before { content: counter(t) "." counter(u) ".\2003"; }
+
+/* ---- code, quotes, rules ---- */
+code, kbd, samp, pre { font-family: "Graphy Mono", "CMU Typewriter Text", "Latin Modern Mono", ui-monospace, monospace; font-size: .93em; hyphens: none; }
+pre { margin: .9em 0; padding: .5em .8em; border: .6pt solid var(--rule); text-align: left; white-space: pre-wrap; text-indent: 0; line-height: 1.25; break-inside: avoid; }
+pre code { font-size: 1em; }
+blockquote { margin: .9em 2em; font-style: italic; } blockquote p { text-indent: 0; }
+hr { border: 0; border-top: .5pt solid var(--rule); margin: 1.4em auto; width: 40%; }
+img { max-width: 100%; }
+
+/* ---- print: A4, margins of the book (inner 32, outer 28, top 28, bottom 34 mm), page number bottom centre ---- */
+@page { size: A4; margin: 28mm 28mm 34mm 32mm; @bottom-center { content: counter(page); font-family: "Graphy CM", "CMU Serif", serif; font-size: 12pt; } }
+@media print {
+  html, body { background: #fff; }
+  body { font-size: 12pt; line-height: 15pt; }
+  .doc { max-width: none; margin: 0; padding: 0; box-shadow: none; }
+  .display { overflow: visible; }
+  h2, h3, h4, caption, figcaption { break-after: avoid; }
+  figure, table, .theorem, .definition, .example, .note { break-inside: avoid; }
+  a[href^="http"] { text-decoration: none; }
+  .no-print { display: none !important; }
+}

@@ -1,0 +1,109 @@
+{
+  "MAX_BYTES": 51200,
+  "MAX_LINES": 2000,
+  "S": {
+    "type": "string"
+  },
+  "N": {
+    "type": "integer",
+    "minimum": 1
+  },
+  "DEFINITIONS": {
+    "read": [
+      "Read text lines or an image. Paths are relative to the launch directory. offset starts at 1; limit bounds lines. Follow next_offset when truncated.",
+      {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    ],
+    "bash": [
+      "Run Bash in the working directory; returns output and exit code. timeout is seconds. Inspect state before retrying an interrupted command.",
+      {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "timeout": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "additionalProperties": false
+      }
+    ],
+    "spawn_researcher": [
+      "Delegate a web research question to a read-only researcher sub-agent (same model, own context, only web search and page reading). Use it when the answer needs fresh, external or multi-source facts: current events, versions, prices, laws and standards, comparisons of sources, background for a course or document. Do not use it for ordinary conversation, explanations you can give from knowledge, one quick lookup (use web_search/web_read) or anything about files. One researcher at a time; it takes tens of seconds to minutes. The researcher starts blank: it cannot see the chat, the learner's notes, files or any memory, and `question` plus `context` are the only things it receives. Put everything it needs there (the exact subject, constraints, the learner's level and goal, what is already known or must be excluded, time frame) and make the question self-contained. It returns a JSON object: summary, key_findings (claim + source ids), sources (id, title, url, note), open_questions, confidence low|medium|high (and report with [n] citations when output=report). Read it, check confidence and open_questions, and answer the learner in your own words with the sources you rely on as links or a short list; never paste the raw JSON, and do not state more certainty than the result supports.",
+      {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000,
+            "description": "The research question, self-contained."
+          },
+          "context": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "Why it is asked, the learner's level or goal, what is already known or must be excluded."
+          },
+          "depth": {
+            "type": "string",
+            "enum": [
+              "quick",
+              "standard",
+              "deep"
+            ],
+            "description": "quick: 1-3 sources; standard (default): about 3-6; deep: broad cross-checking."
+          },
+          "focus": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 6,
+            "description": "Sub-topics or angles to cover."
+          },
+          "output": {
+            "type": "string",
+            "enum": [
+              "brief",
+              "report"
+            ],
+            "description": "brief (default): short summary and findings; report: also a markdown report with [n] citations."
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "Language of the result; default Russian."
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  }
+}

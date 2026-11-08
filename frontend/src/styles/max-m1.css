@@ -1,0 +1,12 @@
+/* New-screen MAX UI pieces: Switch at Graphy density, Segmented. */
+html .ui-switch.ui-switch { flex: none; }
+html .ui-switch.ui-switch > span { --MaxUi-Switch__toggle_width: 36px; --MaxUi-Switch__toggle_height: 22px; --MaxUi-Switch__toggle_paddingX: 3px; --MaxUi-Switch__thumb_size: 12px; --MaxUi-Switch__thumb_offset: 0px; --MaxUi-Switch__toggle_border: 2px solid; }
+html .ui-switch.ui-switch input:checked + span { --MaxUi-Switch__thumb_offset: 14px; --MaxUi-Switch__thumb_scale: 1.25; --MaxUi-Switch__thumb_size: 12px; }
+html .ui-switch.ui-switch input:focus-visible + span { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+@media (forced-colors: active) {
+  .ui-switch input:checked + span { background: Highlight; border-color: Highlight; forced-color-adjust: none; }
+  .ui-switch input + span { border-color: ButtonText; }
+}
+.ui-segmented { min-width: 0; max-width: 100%; }
+.ui-segmented-item.ui-segmented-item { font: 500 13px/20px var(--font-sans); }
+.ui-segmented-item.ui-segmented-item:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }

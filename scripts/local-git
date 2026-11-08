@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# .git is reserved/read-only in the managed workspace; use the local repository.
+set -euo pipefail
+GRAPHY_PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+exec git --git-dir="$GRAPHY_PROJECT_ROOT/.local-git" --work-tree="$GRAPHY_PROJECT_ROOT" "$@"

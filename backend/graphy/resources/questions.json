@@ -1,0 +1,291 @@
+{
+  "MAX_QUESTIONS": 8,
+  "MAX_BLOCK_BYTES": 100000,
+  "TEXT": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 8000,
+    "pattern": "\\S"
+  },
+  "ID": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 100,
+    "pattern": "^[\\w-]+$"
+  },
+  "QUESTION_SCHEMA": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[\\w-]+$"
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "free_text",
+          "single_choice",
+          "multiple_choice"
+        ]
+      },
+      "prompt": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 8000,
+        "pattern": "\\S"
+      },
+      "topic_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[\\w-]+$"
+      },
+      "options": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[\\w-]+$"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8000,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "id",
+            "label"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "allow_custom_answer": {
+        "type": "boolean"
+      },
+      "grading": {
+        "type": "object",
+        "properties": {
+          "correct_option_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[\\w-]+$"
+            }
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000,
+            "pattern": "\\S"
+          },
+          "rubric": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000,
+            "pattern": "\\S"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "id",
+      "type",
+      "prompt"
+    ],
+    "additionalProperties": false
+  },
+  "ASK_SCHEMA": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200,
+        "pattern": "\\S"
+      },
+      "purpose": {
+        "type": "string",
+        "enum": [
+          "diagnosis",
+          "check",
+          "practice",
+          "clarification",
+          "exam"
+        ]
+      },
+      "questions": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[\\w-]+$"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "free_text",
+                "single_choice",
+                "multiple_choice"
+              ]
+            },
+            "prompt": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 8000,
+              "pattern": "\\S"
+            },
+            "topic_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[\\w-]+$"
+            },
+            "options": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 8,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "pattern": "^[\\w-]+$"
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8000,
+                    "pattern": "\\S"
+                  }
+                },
+                "required": [
+                  "id",
+                  "label"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "allow_custom_answer": {
+              "type": "boolean"
+            },
+            "grading": {
+              "type": "object",
+              "properties": {
+                "correct_option_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "pattern": "^[\\w-]+$"
+                  }
+                },
+                "explanation": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 8000,
+                  "pattern": "\\S"
+                },
+                "rubric": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 8000,
+                  "pattern": "\\S"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "prompt"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "title",
+      "purpose",
+      "questions"
+    ],
+    "additionalProperties": false
+  },
+  "ANSWER_SCHEMA": {
+    "type": "object",
+    "properties": {
+      "question_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "^[\\w-]+$"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "answered",
+          "skipped",
+          "dont_know",
+          "draft"
+        ]
+      },
+      "selected_option_ids": {
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[\\w-]+$"
+        },
+        "maxItems": 8
+      },
+      "text": {
+        "type": "string",
+        "maxLength": 16000
+      },
+      "reasoning": {
+        "type": "string",
+        "maxLength": 16000
+      }
+    },
+    "required": [
+      "question_id",
+      "status",
+      "selected_option_ids",
+      "text",
+      "reasoning"
+    ],
+    "additionalProperties": false
+  },
+  "DONT_KNOW": "(the learner chose \"I don't know\": a declared gap, not a wrong answer)",
+  "SUBMITTED_NOTE": "These are the LEARNER's own answers to your test (not system-generated). Assess every question against the key you committed in the call; read the reasoning too."
+}

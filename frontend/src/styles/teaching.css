@@ -1,0 +1,8 @@
+/* Teacher workspace (classes). */
+.teach-view { position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 0 12px; box-sizing: border-box; width: 100%; }
+.teach-scroll { flex: 1; min-height: 0; overflow: auto; padding: 16px 2px 32px; }
+.teach-empty { padding: 48px 16px; max-width: 52ch; }
+.teach-empty-title { margin: 0 0 8px; font: 500 20px/28px var(--font-sans); color: var(--ink); }
+.teach-empty-text { margin: 0; color: var(--ink-2); font: 400 14px/22px var(--font-sans); }
+.class-view { display: flex; flex-direction: column; gap: 16px; }
+.my-chats-head { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 12px 4px 0 0; }

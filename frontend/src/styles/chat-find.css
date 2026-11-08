@@ -1,0 +1,13 @@
+/* Find in chat: the bar and the Custom Highlight API ranges. Field and IconButton are MAX UI. */
+.chat-find-field { flex: 1; min-width: 0; width: 220px; }
+.chat-find-field .ui-field-control { --input-height: 28px; min-height: 28px; height: 28px; border-radius: var(--r-md); }
+.chat-find-field[aria-invalid="true"], .chat-find-input[aria-invalid="true"] { color: var(--danger); }
+.chat-find { position: absolute; z-index: 20; top: 8px; right: 16px; display: flex; align-items: center; gap: 4px; max-width: calc(100% - 32px); padding: 4px 4px 4px 4px; border: 1px solid var(--rule); border-radius: var(--r-lg); background: var(--sheet); color: var(--ink); box-shadow: var(--shadow-pop); animation: chat-find-in 140ms cubic-bezier(.2, 0, 0, 1); }
+.chat-find-input::placeholder { color: var(--ink-3); }
+.chat-find-count { min-width: 64px; padding: 0 6px; text-align: right; white-space: nowrap; font: 400 12px/18px var(--font-sans); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.chat-find-count[data-none] { color: var(--danger); }
+::highlight(graphy-find) { background-color: color-mix(in srgb, var(--md-sys-color-tertiary-container) 85%, transparent); color: var(--md-sys-color-on-tertiary-container); }
+::highlight(graphy-find-current) { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+@keyframes chat-find-in { from { opacity: 0; transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .chat-find { animation: none; } }
+@media (forced-colors: active) { ::highlight(graphy-find) { background-color: Highlight; color: HighlightText; } ::highlight(graphy-find-current) { background-color: Mark; color: MarkText; } }
