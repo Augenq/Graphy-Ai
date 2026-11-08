@@ -55,6 +55,14 @@ Graphy — агент для школы: учителю помогает гот�
     <td align="center">Результаты и ручная проверка</td>
     <td align="center">Настройки</td>
   </tr>
+  <tr>
+    <td><img src="docs/screenshots/screenshot-2120.jpg" alt="Graphy — скриншот"></td>
+    <td><img src="docs/screenshots/screenshot-2127.jpg" alt="Graphy — скриншот"></td>
+  </tr>
+  <tr>
+    <td align="center">Скриншот</td>
+    <td align="center">Скриншот</td>
+  </tr>
 </table>
 
 <p align="center">
