@@ -67,7 +67,7 @@ pub fn preset_meta() -> Value {
 fn prefs_for(q: &str, context_tokens: Option<usize>) -> (Vec<&'static str>, &'static str) {
     match q {
         "fast" => (vec!["deepseek/deepseek-v4.1-flash", "deepseek-v4.1-flash"], "medium"),
-        "deep" => (vec!["anthropic/claude-sonnet-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol", "gpt-6.1-sol"], "max"),
+        "deep" => (vec!["anthropic/claude-sonnet-5-5", "claude-sonnet-5-5", "openai/gpt-6.1-sol", "gpt-6.1-sol"], "high"),
         _ => {
             if context_tokens.unwrap_or(0) > BALANCED_LONG_CONTEXT {
                 (vec!["openai/gpt-6.1-terra", "gpt-6.1-terra"], "medium")
