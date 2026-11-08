@@ -17,14 +17,17 @@ export function UsageChip({ session }: { session: Session }) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLSpanElement>(null);
   const pop = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ right: number; bottom: number } | null>(null);
+  const [pos, setPos] = useState<{ right: number; bottom: number; max: number } | null>(null);
   const id = useId();
   useLayoutEffect(() => {
     if (!open || !root.current) return;
     const place = () => {
       const r = root.current?.getBoundingClientRect();
       if (!r) return;
-      setPos({ right: Math.max(8, window.innerWidth - r.right), bottom: window.innerHeight - r.top + 8 });
+      // open above the composer card (not the chip under it), so the popover never covers the input and its controls
+      const top = Math.min(r.top, root.current?.closest(".lesson-composer")?.getBoundingClientRect().top ?? r.top);
+      const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; // desktop scales the page: fixed offsets are in zoomed px
+      setPos({ right: Math.max(8, (window.innerWidth - r.right) / zoom), bottom: (window.innerHeight - top) / zoom + 8, max: Math.max(120, (top - 16) / zoom) });
     };
     place();
     window.addEventListener("resize", place);
@@ -63,7 +66,7 @@ export function UsageChip({ session }: { session: Session }) {
         {hit != null && hit >= 0.005 && <span className="usage-chip-cache tabular-nums" title={t("Доля входных токенов из кэша")}>{fmtPercent(hit)}</span>}
       </button>
       {open && pos && createPortal(
-        <div ref={pop} id={id} className="usage-pop" role="dialog" aria-label={t("Расход этого занятия")} style={{ position: "fixed", right: pos.right, bottom: pos.bottom, top: "auto", left: "auto" }}>
+        <div ref={pop} id={id} className="usage-pop" role="dialog" aria-label={t("Расход этого занятия")} style={{ position: "fixed", right: pos.right, bottom: pos.bottom, maxHeight: pos.max, top: "auto", left: "auto" }}>
           <div className="usage-pop-title">{t("Расход этого занятия")}</div>
           <dl>
             <Row label={t("Ввод")} value={fmtInt(u.input)} />

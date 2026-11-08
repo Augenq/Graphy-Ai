@@ -175,13 +175,28 @@ function prepareUserDir(u) {
   settings.providers = { ...(settings.providers || {}), openrouter: { ...(settings.providers?.openrouter || {}), base_url: `http://127.0.0.1:${env.GRAPHY_WEB_PORT || 5174}/llm` } };
   writeNoFollow(sf, JSON.stringify(settings), 0o600);
   const auth = path.join(dir, 'auth.json');
-  writeNoFollow(auth, JSON.stringify({ openrouter: { key: llmTokenFor(u.id) } }), 0o600);
+  setDefaultKey(u);
   if (AS_USER) for (const d of [dir, path.join(dir, 'home'), work]) { try { execChown(d, u.osuid); } catch (e) { console.error('chown', e.message); } }
 }
 function dropLink(f) { try { if (fs.lstatSync(f).isSymbolicLink()) fs.unlinkSync(f); } catch { /* absent */ } }
 export function writeNoFollow(f, data, mode) {
   const fd = fs.openSync(f, fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_TRUNC | fs.constants.O_NOFOLLOW, mode);
   try { fs.writeSync(fd, data); } finally { fs.closeSync(fd); }
+}
+const userDir = (u) => path.join(USERS_DIR, u.id);
+/** The user's own OpenRouter key (anything that is not the hub's token), or ''. */
+export function ownKeyOf(u) {
+  try { const k = JSON.parse(fs.readFileSync(path.join(userDir(u), 'auth.json'), 'utf8'))?.openrouter?.key; return typeof k === 'string' && k && !k.startsWith('gl-') ? k : ''; } catch { return ''; }
+}
+/** Default: the agent talks to the hub's /llm proxy with a personal token, the service key never leaves the hub. A key the user saved themselves is kept; other providers' keys are kept too. */
+export function setDefaultKey(u) {
+  const auth = path.join(userDir(u), 'auth.json');
+  dropLink(auth);
+  let cur = {};
+  try { cur = JSON.parse(fs.readFileSync(auth, 'utf8')) || {}; } catch { /* new user */ }
+  if (!ownKeyOf(u)) cur.openrouter = { ...(cur.openrouter || {}), key: llmTokenFor(u.id) };
+  writeNoFollow(auth, JSON.stringify(cur), 0o600);
+  if (AS_USER) { try { fs.lchownSync(auth, u.osuid, u.osuid); } catch { /* ignore */ } }
 }
 export function execChown(dir, uid) {
   if (fs.lstatSync(dir).isSymbolicLink()) return; // lchown semantics: never follow links planted by an agent
@@ -233,7 +248,7 @@ async function agentFor(u) {
     const dir = path.join(USERS_DIR, u.id);
     const childEnv = {
       PATH: env.PATH, PYTHONPATH: env.PYTHONPATH, PYTHONUNBUFFERED: '1', PYTHONDONTWRITEBYTECODE: '1', HOME: path.join(dir, 'home'), TMPDIR: '/tmp',
-      GRAPHY_SANDBOX: env.GRAPHY_SANDBOX || 'docker', GRAPHY_DIR: dir, GRAPHY_CORE_LIBRARY: env.GRAPHY_CORE_LIBRARY, GRAPHY_RESOURCE_DIR: env.GRAPHY_RESOURCE_DIR,
+      GRAPHY_SANDBOX: env.GRAPHY_SANDBOX || 'docker', GRAPHY_SERVICE_URL: 'off', GRAPHY_DIR: dir, GRAPHY_CORE_LIBRARY: env.GRAPHY_CORE_LIBRARY, GRAPHY_RESOURCE_DIR: env.GRAPHY_RESOURCE_DIR,
       GRAPHY_TOKEN: token, GRAPHY_API_TOKEN: token, SEARXNG_URL: env.SEARXNG_URL,
       // locale and cache dirs for the document/computing tools (the root fs is read-only: caches go to /tmp)
       LANG: env.LANG || 'C.UTF-8', LC_ALL: env.LC_ALL || 'C.UTF-8', MPLBACKEND: env.MPLBACKEND || 'Agg', MPLCONFIGDIR: env.MPLCONFIGDIR || '/tmp/mplconfig',
@@ -263,34 +278,145 @@ setInterval(() => {
   for (const [id, a] of agents) if (Date.now() - a.last > IDLE_MS && !a.streams) killAgent(id, a);
 }, 30_000).unref();
 
-function proxyToAgent(req, res, a, incoming) {
+const LOCAL_ENDPOINT_MSG = 'В этом режиме нельзя указывать свой адрес API: подключите провайдера по ключу.';
+/** The service key is never shown: a provider that runs on it is reported as key_source "service". */
+export function markServiceKey(json, u) {
+  if (ownKeyOf(u)) return json;
+  const list = Array.isArray(json) ? json : json?.providers;
+  if (Array.isArray(list)) for (const p of list) if (p?.name === 'openrouter' && p.configured) p.key_source = 'service';
+  return json;
+}
+function proxyToAgent(req, res, a, incoming, u) {
   a.streams = (a.streams || 0) + 1; // keep the agent alive while a request or SSE stream is open
   const target = new URL(`http://127.0.0.1:${a.port}`);
   target.pathname = incoming.pathname;
   target.search = incoming.search;
   target.searchParams.delete('token');
+  const p = incoming.pathname;
+  const listing = req.method === 'GET' && /^\/api\/v1\/(bootstrap|providers)\/?$/.test(p);
+  const dropsKey = req.method === 'DELETE' && p === '/api/v1/providers/openrouter';
+  const guardBody = (req.method === 'PUT' || req.method === 'POST') && /^\/api\/v1\/providers(\/|$)/.test(p);
   const headers = { ...req.headers, host: target.host, authorization: `Bearer ${a.token}` };
-  delete headers.origin; delete headers.cookie;
-  const up = http.request(target, { method: req.method, headers }, (r) => { res.writeHead(r.statusCode, { ...r.headers, 'cache-control': 'no-store' }); r.pipe(res); });
+  delete headers.origin; delete headers.cookie; if (listing) delete headers['accept-encoding'];
+  const up = http.request(target, { method: req.method, headers }, (r) => {
+    if (listing) {
+      const chunks = [];
+      r.on('data', (c) => chunks.push(c));
+      r.on('end', () => {
+        let out = Buffer.concat(chunks);
+        try { out = Buffer.from(JSON.stringify(markServiceKey(JSON.parse(out.toString('utf8')), u))); } catch { /* pass through */ }
+        const h = { ...r.headers, 'cache-control': 'no-store', 'content-length': out.length }; delete h['transfer-encoding'];
+        res.writeHead(r.statusCode, h); res.end(out);
+      });
+      return;
+    }
+    if (dropsKey && r.statusCode < 400) { try { setDefaultKey(u); } catch (e) { console.error('restore key', e.message); } }
+    res.writeHead(r.statusCode, { ...r.headers, 'cache-control': 'no-store' }); r.pipe(res);
+  });
   const done = () => { if (a.streams > 0) { a.streams--; a.last = Date.now(); } };
   res.on('close', () => { up.destroy(); done(); });
   up.on('error', () => { if (!res.headersSent) res.writeHead(502, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: { code: 'agent_unavailable', message: 'Нет связи с агентом' } })); });
-  req.pipe(up);
+  if (!guardBody) { req.pipe(up); return; }
+  const chunks = []; let size = 0;
+  req.on('data', (c) => { size += c.length; if (size > 65_536) { req.destroy(); up.destroy(); } else chunks.push(c); });
+  req.on('end', () => {
+    const raw = Buffer.concat(chunks);
+    let j = null; try { j = JSON.parse(raw.toString('utf8')); } catch { /* not json: let the agent reject it */ }
+    if (j && typeof j === 'object' && (Object.hasOwn(j, 'base_url') || Object.hasOwn(j, 'api'))) { send(res, 400, { error: { code: 'invalid', message: LOCAL_ENDPOINT_MSG } }); up.destroy(); return; }
+    up.end(raw);
+  });
+}
+
+// ---------- public tier: the "Graphy" provider of locally installed apps ----------
+// An install token (anon-<32 hex>, made by the app itself) may use three models through this server's OpenRouter key.
+// Limits are by estimated worst-case cost per day: per token, per client IP and in total. GRAPHY_PUBLIC_LLM=off switches the tier off.
+const PUBLIC_LLM = env.GRAPHY_PUBLIC_LLM !== 'off';
+const ANON_MODELS = { 'deepseek/deepseek-v4.1-flash': [0.15, 0.6], 'anthropic/claude-haiku-5.5': [0.5, 2.5], 'anthropic/claude-sonnet-5.5': [2, 10] }; // USD per million tokens (in, out), rounded up
+const ANON_CAP = { token: Number(env.GRAPHY_ANON_USD_TOKEN || 1), ip: Number(env.GRAPHY_ANON_USD_IP || 2.5), total: Number(env.GRAPHY_ANON_USD_TOTAL || 12) };
+const ANON_MAX_TOKENS = 8192, ANON_BODY = 1_500_000;
+const anonFile = path.join(DATA, 'anon-usage.json');
+const today = () => new Date().toISOString().slice(0, 10);
+let anonUsed = {};
+try { const j = JSON.parse(fs.readFileSync(anonFile, 'utf8')); if (j.day === today()) anonUsed = j.used || {}; } catch { /* first run */ }
+let anonDirty = false;
+setInterval(() => {
+  if (!anonDirty) return; anonDirty = false;
+  try { fs.writeFileSync(anonFile + '.tmp', JSON.stringify({ day: today(), used: anonUsed })); fs.renameSync(anonFile + '.tmp', anonFile); } catch { /* best effort */ }
+}, 20_000).unref();
+export function anonCharge(id, ip, usd, caps = ANON_CAP, day = today()) {
+  const kt = `${day}:t:${id}`, ki = `${day}:i:${ip}`, kg = `${day}:total`;
+  if (Object.keys(anonUsed).some((k) => !k.startsWith(day))) anonUsed = Object.fromEntries(Object.entries(anonUsed).filter(([k]) => k.startsWith(day)));
+  if ((anonUsed[kt] || 0) + usd > caps.token || (anonUsed[ki] || 0) + usd > caps.ip || (anonUsed[kg] || 0) + usd > caps.total) return false;
+  anonUsed[kt] = (anonUsed[kt] || 0) + usd; anonUsed[ki] = (anonUsed[ki] || 0) + usd; anonUsed[kg] = (anonUsed[kg] || 0) + usd; anonDirty = true;
+  return true;
+}
+export function anonEstimate(body, rawLength) {
+  const price = ANON_MODELS[body?.model];
+  if (!price) return null;
+  const out = Math.min(Number(body.max_tokens || body.max_completion_tokens) || 4096, ANON_MAX_TOKENS);
+  return { out, usd: ((rawLength / 3) * price[0] + out * price[1]) / 1e6 };
+}
+const clientIp = (req) => {
+  const peer = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+  const trusted = /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|::1$)/.test(peer);
+  return (trusted && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || peer;
+};
+function anonProxy(req, res, incoming, id) {
+  if (!PUBLIC_LLM || !LLM_KEY) return send(res, 503, { error: { message: 'Бесплатный режим сейчас недоступен. Попробуйте позже.' } });
+  const sub = incoming.pathname.replace(/^\/llm/, '');
+  const ip = clientIp(req);
+  const upstream = (method, subpath, body, onResponse) => {
+    const target = new URL(LLM_UPSTREAM + subpath);
+    const headers = { 'content-type': 'application/json', authorization: `Bearer ${LLM_KEY}`, accept: req.headers.accept || '*/*', host: target.host, ...(body ? { 'content-length': Buffer.byteLength(body) } : {}) };
+    const up = https.request(target, { method, headers }, onResponse);
+    up.on('error', () => { if (!res.headersSent) res.writeHead(502); res.end(); });
+    up.setTimeout(300_000, () => up.destroy());
+    res.on('close', () => up.destroy());
+    up.end(body);
+  };
+  if (req.method === 'GET' && sub === '/models') { // only the three models, with the provider's own metadata
+    return upstream('GET', '/models', null, (r) => {
+      const chunks = []; r.on('data', (c) => chunks.push(c));
+      r.on('end', () => {
+        let out = Buffer.concat(chunks);
+        try { const j = JSON.parse(out.toString('utf8')); j.data = (j.data || []).filter((m) => ANON_MODELS[m.id]); out = Buffer.from(JSON.stringify(j)); } catch { /* pass through */ }
+        res.writeHead(r.statusCode, { 'content-type': 'application/json', 'content-length': out.length }); res.end(out);
+      });
+    });
+  }
+  if (req.method !== 'POST' || sub !== '/chat/completions') return send(res, 404, { error: { message: 'not found' } });
+  const chunks = []; let size = 0, dead = false;
+  req.on('data', (c) => { size += c.length; if (size > ANON_BODY) { dead = true; send(res, 413, { error: { message: 'Слишком большой запрос' } }); req.destroy(); } else chunks.push(c); });
+  req.on('end', () => {
+    if (dead) return;
+    let body; try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { return send(res, 400, { error: { message: 'bad json' } }); }
+    const est = anonEstimate(body, size);
+    if (!est) return send(res, 403, { error: { message: 'Эта модель недоступна в бесплатном режиме.' } });
+    delete body.plugins; delete body.web_search_options; delete body.transforms; delete body.route;
+    body.max_tokens = est.out; delete body.max_completion_tokens;
+    if (!anonCharge(id, ip, est.usd)) return send(res, 429, { error: { message: 'Лимит бесплатного режима на сегодня исчерпан. Попробуйте завтра или подключите свой ключ OpenRouter.' } });
+    upstream('POST', '/chat/completions', JSON.stringify(body), (r) => { res.writeHead(r.statusCode, r.headers); r.pipe(res); });
+  });
 }
 
 // ---------- LLM proxy (key stays here) ----------
 const usage = new Map(); // `${uid}:${day}` -> count
 function llmProxy(req, res, incoming) {
-  const m = /^gl-(\d+)-([0-9a-f]{32})$/.exec(bearer(req));
-  if (!m || !safeEq(hmac(SECRET, `llm:${m[1]}`, 'hex').slice(0, 32), m[2])) return send(res, 401, { error: { message: 'bad token' } });
-  const key = `${m[1]}:${new Date().toISOString().slice(0, 10)}`;
-  const n = (usage.get(key) || 0) + 1; usage.set(key, n);
-  if (usage.size > 5000) usage.clear();
-  if (n > DAILY_LLM) return send(res, 429, { error: { message: 'Дневной лимит запросов к модели исчерпан. Попробуйте завтра.' } });
+  const given = bearer(req);
+  if (/^anon-[0-9a-f]{32}$/.test(given)) return anonProxy(req, res, incoming, given);
+  const ownKey = /^sk-or-[\w-]{10,}$/.test(given) ? given : ''; // the user's own OpenRouter key: their account, their limits
+  if (!ownKey) {
+    const m = /^gl-(\d+)-([0-9a-f]{32})$/.exec(given);
+    if (!m || !safeEq(hmac(SECRET, `llm:${m[1]}`, 'hex').slice(0, 32), m[2])) return send(res, 401, { error: { message: 'bad token' } });
+    const key = `${m[1]}:${new Date().toISOString().slice(0, 10)}`;
+    const n = (usage.get(key) || 0) + 1; usage.set(key, n);
+    if (usage.size > 5000) usage.clear();
+    if (n > DAILY_LLM) return send(res, 429, { error: { message: 'Дневной лимит запросов к модели исчерпан. Попробуйте завтра или подключите свой ключ OpenRouter в настройках.' } });
+  }
   if (Number(req.headers['content-length'] || 0) > 16 * 1024 * 1024) return send(res, 413, { error: { message: 'too large' } });
-  if (!LLM_KEY) return send(res, 503, { error: { message: 'Модель не настроена на сервере' } });
+  if (!ownKey && !LLM_KEY) return send(res, 503, { error: { message: 'Модель не настроена на сервере' } });
   const target = new URL(LLM_UPSTREAM + incoming.pathname.replace(/^\/llm/, '') + incoming.search);
-  const headers = { ...req.headers, host: target.host, authorization: `Bearer ${LLM_KEY}` };
+  const headers = { ...req.headers, host: target.host, authorization: `Bearer ${ownKey || LLM_KEY}` };
   delete headers.origin; delete headers.cookie; delete headers['accept-encoding'];
   const up = https.request(target, { method: req.method, headers }, (r) => { res.writeHead(r.statusCode, r.headers); r.pipe(res); });
   up.on('error', () => { if (!res.headersSent) res.writeHead(502); res.end(); });
@@ -487,7 +613,7 @@ export async function handleHub(req, res) {
       const u = userFromSession(bearer(req) || incoming.searchParams.get('token'));
       if (!u) { send(res, 401, { error: { code: 'unauthorized', message: 'Требуется вход через MAX' } }); return true; }
       const a = await agentFor(u);
-      proxyToAgent(req, res, a, incoming);
+      proxyToAgent(req, res, a, incoming, u);
       return true;
     }
   } catch (e) {

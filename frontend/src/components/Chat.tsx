@@ -146,17 +146,26 @@ export function Thread({ session, onChooseModel }: Props) {
     } else toBottom();
     const near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     stick.current = near;
+    seenH.current = el.clientHeight;
     setAway(!stick.current);
   }, [id, toBottom]);
 
   // any growth (stream, form step, expanded row) keeps the bottom in view when the learner is there
   useEffect(() => {
     const c = content.current;
-    if (!c) return;
+    const sc = scroller.current;
+    if (!c || !sc) return;
+    // also the scroller itself: a growing composer or an on-screen keyboard shrinks it without scrolling, so
+    // `stick` still says where the learner WAS (a scroll event after the resize would measure the new distance)
     const ro = new ResizeObserver(() => {
+      if (!stick.current && sc.scrollHeight - sc.scrollTop - sc.clientHeight < 80) {
+        stick.current = true;
+        setAway(false);
+      }
       if (stick.current) follow();
     });
     ro.observe(c);
+    ro.observe(sc);
     return () => {
       ro.disconnect();
       stopRamp();
@@ -165,9 +174,18 @@ export function Thread({ session, onChooseModel }: Props) {
 
   const raf = useRef(0);
   const jumping = useRef(false);
+  const inputAt = useRef(-1e9); // last wheel/touch/pointer/key input: a scroll event right after it is the learner's
+  const seenH = useRef(0); // scroller height at the last scroll event
   const onScroll = () => {
     const el = scroller.current;
     if (!el) return;
+    // a scroll event caused by the scroller resizing (composer growing, keyboard) measures the NEW distance:
+    // keep `stick` as it was and let the resize observer re-stick
+    if (performance.now() - inputAt.current > 200 && seenH.current && Math.abs(el.clientHeight - seenH.current) > 0.5) {
+      seenH.current = el.clientHeight;
+      return;
+    }
+    seenH.current = el.clientHeight;
     const near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
     // the smooth scroll of the jump button passes through positions that are not near yet: keep following
     if (jumping.current && !near) return;
@@ -223,9 +241,10 @@ export function Thread({ session, onChooseModel }: Props) {
       <div
         ref={scroller}
         onScroll={onScroll}
-        onWheel={(e) => { jumping.current = false; if (e.deltaY < 0) stopRamp(); }}
-        onTouchMove={() => { jumping.current = false; stopRamp(); }}
-        onPointerDown={stopRamp}
+        onWheel={(e) => { inputAt.current = performance.now(); jumping.current = false; if (e.deltaY < 0) stopRamp(); }}
+        onTouchMove={() => { inputAt.current = performance.now(); jumping.current = false; stopRamp(); }}
+        onPointerDown={() => { inputAt.current = performance.now(); stopRamp(); }}
+        onKeyDown={(e) => { if (/^(PageUp|PageDown|Arrow(Up|Down)|Home|End)$/.test(e.key)) inputAt.current = performance.now(); }}
         role="log"
         aria-live="polite"
         aria-relevant="additions"

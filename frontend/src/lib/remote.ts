@@ -23,7 +23,7 @@ export interface ProviderInfo {
   base_url: string;
   key_env: string;
   configured: boolean;
-  key_source: "env" | "stored" | "";
+  key_source: "env" | "stored" | "service" | "";
   models: number;
 }
 

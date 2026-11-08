@@ -185,6 +185,8 @@ button, nav, aside, header, .chrome { user-select: none; }
 textarea, input, .selectable { user-select: text; }
 ::selection { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
 .scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+/* classic scrollbars: reserve the track on both edges so the centred column neither shifts when content crosses the viewport nor leaves the composer off-centre */
+[role="log"].scroll-y { scrollbar-gutter: stable both-edges; }
 .scroll-x { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
 .material-button { flex-shrink: 0; }
 .material-icon-button { flex-shrink: 0; }

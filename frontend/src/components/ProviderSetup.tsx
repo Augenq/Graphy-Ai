@@ -1,6 +1,7 @@
 import { ModelIcon } from "./ModelIcon";
 import { Button, Field as UIField, Progress } from "./ui/index";
 import { t } from "../lib/i18n";
+import { useMax } from "../lib/max";
 import { useState, type ReactNode } from "react";
 import { Select } from "./Select";
 import { describe } from "../lib/api";
@@ -89,9 +90,9 @@ function KeyForm({ provider }: { provider: ProviderInfo | null }) {
     </div>}
     {(custom || local) && <Field label={t("Адрес API")} value={url} onInput={setUrl} placeholder="http://localhost:8080/v1" />}
     <Field label={local || custom ? t("Ключ API (необязательно)") : t("Ключ API")} type="password" value={key} onInput={setKey}
-      placeholder={provider?.key_source === "env" ? t("Взят из переменной {0}", [provider.key_env]) : provider?.key_source === "stored" ? t("Сохранён · введите новый, чтобы заменить") : ""} />
+      placeholder={provider?.key_source === "env" ? t("Взят из переменной {0}", [provider.key_env]) : provider?.key_source === "service" ? t("Свой ключ (необязательно): по умолчанию используется ключ сервиса") : provider?.key_source === "stored" ? t("Сохранён · введите новый, чтобы заменить") : ""} />
     <div className="flex flex-wrap items-center gap-2">
-      <Button variant="secondary" type="submit" disabled={!valid || busy}>{provider?.configured ? t("Сохранить") : t("Подключить")}</Button>
+      <Button variant="secondary" type="submit" disabled={!valid || busy}>{provider?.configured && provider.key_source !== "service" ? t("Сохранить") : t("Подключить")}</Button>
       {provider?.configured && provider.key_source === "stored" && <Button variant="ghost" type="button" onClick={() => void disconnectProvider(provider.name)}>{t("Удалить ключ")}</Button>}
     </div>
     {busy && <Progress indeterminate aria-label={t("Подключение")} />}
@@ -101,7 +102,9 @@ function KeyForm({ provider }: { provider: ProviderInfo | null }) {
 
 /** Providers the agent can use: pick one, enter what it needs, see at once whether models were found. */
 export function ProviderSetup() {
-  const providers = useRemote((r) => r.providers);
+  const hub = useMax().hub;
+  // hosted (MAX) mode: local model servers cannot work there and a custom address would let the server reach arbitrary hosts
+  const providers = useRemote((r) => r.providers).filter((p) => !hub || p.kind !== "local");
   const [open, setOpen] = useState<string | null>(null);
   const sorted = [...providers].sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) || Number(b.configured) - Number(a.configured));
   const row = (id: string, icon: string, title: string, note: ReactNode, form: ReactNode, connected = false) => (
@@ -118,8 +121,8 @@ export function ProviderSetup() {
   );
   return <div className="flex flex-col gap-2">
     {sorted.map((p) => row(p.name, KIND_ICON[p.kind], p.name,
-      p.configured ? (p.key_source === "env" ? t("Ключ из переменной {0}", [p.key_env]) : t("Подключено")) : p.kind === "oauth" ? t("Вход через браузер или код устройства") : p.kind === "local" ? t("Локальный сервер: данные не покидают компьютер") : t("Нужен ключ API"),
+      p.configured ? (p.key_source === "env" ? t("Ключ из переменной {0}", [p.key_env]) : p.key_source === "service" ? t("Работает на ключе сервиса: можно подключить свой") : t("Подключено")) : p.kind === "oauth" ? t("Вход через браузер или код устройства") : p.kind === "local" ? t("Локальный сервер: данные не покидают компьютер") : t("Нужен ключ API"),
       p.kind === "oauth" ? <CodexLogin /> : <KeyForm provider={p} />, p.configured))}
-    {row(CUSTOM, "add", t("Другой совместимый сервер"), t("Свой адрес и протокол"), <KeyForm provider={null} />)}
+    {!hub && row(CUSTOM, "add", t("Другой совместимый сервер"), t("Свой адрес и протокол"), <KeyForm provider={null} />)}
   </div>;
 }

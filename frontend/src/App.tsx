@@ -365,7 +365,7 @@ function Workspace() {
               />
               <div className="lesson-body">
                 <div className="lesson-chat">
-                  <Thread session={session} onChooseModel={() => openSettings("models")} />
+                  <Thread session={session} onChooseModel={() => openSettings("general")} />
                   <Composer session={session} />
                 </div>
                 <Panel session={session} narrow={panelOverlay} />

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-export const SETTINGS_SECTION_IDS = ["profile", "general", "appearance", "models", "agent", "skills", "memory", "data", "usage", "keyboard", "about"] as const;
+export const SETTINGS_SECTION_IDS = ["profile", "general", "appearance", "agent", "skills", "memory", "data", "usage", "keyboard", "about"] as const;
 export type SettingsSection = (typeof SETTINGS_SECTION_IDS)[number];
 
 /** Settings are a page of their own and live in the hash: `#settings/<section>`.

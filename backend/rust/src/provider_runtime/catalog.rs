@@ -46,7 +46,14 @@ pub fn write(root: &Path, name: &str, value: &Value) -> Result<(), String> {
     f.persist(root.join(name)).map_err(|e| e.to_string())?;
     Ok(())
 }
+/// The project's own model service: the app sends the request to our server, which forwards it to OpenRouter with the server key.
+/// It needs no setup: an anonymous per-install token is created on first use. `GRAPHY_SERVICE_URL` overrides the address, `off` disables it.
+pub const GRAPHY_SERVICE_URL: &str = "https://78-17-61-24.sslip.io:8443/llm";
+pub fn graphy_enabled() -> bool {
+    std::env::var("GRAPHY_SERVICE_URL").map(|v| v != "off").unwrap_or(true)
+}
 pub const PRESETS: &[(&str, &str, &str, &str)] = &[
+    ("graphy", "chat", GRAPHY_SERVICE_URL, "GRAPHY_API_KEY"),
     (
         "openai",
         "responses",
@@ -129,6 +136,13 @@ pub fn settings(root: &Path, provider: &str) -> Result<Value, String> {
     let prefs = read(root, "settings.json")?;
     let mut v = json!({"api":api,"base_url":url,"env":env});
     merge(&mut v, &prefs["providers"][provider]);
+    if provider == "graphy" {
+        if let Ok(u) = std::env::var("GRAPHY_SERVICE_URL") {
+            if !u.is_empty() && u != "off" {
+                v["base_url"] = json!(u.trim_end_matches('/'));
+            }
+        }
+    }
     if provider == "llama.cpp" {
         let u = std::env::var("LLAMA_BASE_URL")
             .ok()
@@ -193,7 +207,16 @@ pub fn key(root: &Path, p: &str, c: &Value) -> Result<String, String> {
             return Ok(value);
         }
     }
-    Ok(s(&credential(root, p)?["key"]).to_owned())
+    let stored = s(&credential(root, p)?["key"]).to_owned();
+    if stored.is_empty() && p == "graphy" && graphy_enabled() {
+        // first use: an anonymous install token (random, no account); the server limits it per day
+        let token = format!("anon-{}", uuid::Uuid::new_v4().simple());
+        let mut auth = read(root, "auth.json")?;
+        auth[p] = json!({"key": token});
+        write(root, "auth.json", &auth)?;
+        return Ok(token);
+    }
+    Ok(stored)
 }
 fn model(root: &Path, p: &str, item: &Value) -> Result<Value, String> {
     let c = settings(root, p)?;
@@ -213,6 +236,9 @@ pub fn catalog(root: &Path) -> Result<Vec<Value>, String> {
     let mut map = std::collections::BTreeMap::new();
     for item in snapshot {
         let p = s(&item["provider"]);
+        if p == "graphy" && !graphy_enabled() {
+            continue;
+        }
         map.insert(
             (p.to_owned(), s(&item["id"]).to_owned()),
             model(root, p, &item)?,
@@ -324,14 +350,16 @@ pub async fn dispatch(op: &str, data: Value) -> Result<Value, String> {
                 let from_env =
                     !env.is_empty() && std::env::var(env).map(|s| !s.is_empty()).unwrap_or(false);
                 let stored = !s(&cred["key"]).is_empty();
-                let configured = if n == "openai-codex" {
+                let configured = if n == "graphy" {
+                    graphy_enabled()
+                } else if n == "openai-codex" {
                     !s(&cred["refresh"]).is_empty()
                 } else {
                     from_env
                         || stored
                         || (prefs["providers"].get(&n).is_some() && (local(&n) || env.is_empty()))
                 };
-                rows.push(json!({"name":n,"kind":if s(&c["api"])=="codex"{"oauth"}else if local(&n){"local"}else if PRESETS.iter().any(|x|x.0==n){"api"}else{"custom"},"api":c["api"],"base_url":c["base_url"],"key_env":env,"configured":configured,"key_source":if from_env{"env"}else if stored{"stored"}else{""},"models":models.iter().filter(|m|s(&m["provider"])==n).count()}));
+                rows.push(json!({"name":n,"kind":if s(&c["api"])=="codex"{"oauth"}else if n=="graphy"{"service"}else if local(&n){"local"}else if PRESETS.iter().any(|x|x.0==n){"api"}else{"custom"},"api":c["api"],"base_url":c["base_url"],"key_env":env,"configured":configured,"key_source":if from_env{"env"}else if stored{"stored"}else{""},"models":models.iter().filter(|m|s(&m["provider"])==n).count()}));
             }
             Ok(json!(rows))
         }
@@ -770,4 +798,22 @@ async fn llama_router(
         entries.push(item);
     }
     Ok(Some(entries))
+}
+
+#[cfg(test)]
+mod graphy_tests {
+    use super::*;
+    #[test]
+    fn graphy_models_are_the_three_quality_presets_and_the_token_is_created_once() {
+        let dir = tempfile::tempdir().unwrap();
+        let ids: Vec<String> = available(dir.path()).unwrap().iter().filter(|m| s(&m["provider"]) == "graphy").map(|m| s(&m["id"]).to_owned()).collect();
+        assert_eq!(ids.len(), 3, "{ids:?}");
+        for want in ["deepseek/deepseek-v4.1-flash", "anthropic/claude-haiku-5.5", "anthropic/claude-sonnet-5.5"] {
+            assert!(ids.iter().any(|i| i == want), "{want}");
+        }
+        let first = credential(dir.path(), "graphy").unwrap();
+        assert!(s(&first["key"]).starts_with("anon-"));
+        let again = key(dir.path(), "graphy", &settings(dir.path(), "graphy").unwrap()).unwrap();
+        assert_eq!(again, s(&first["key"]), "the same install keeps its token");
+    }
 }

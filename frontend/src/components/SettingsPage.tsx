@@ -32,7 +32,6 @@ const SECTIONS: { id: SettingsSection; label: string; blurb: string; icon: React
   { id: "profile", blurb: "Ваш аккаунт MAX, роль и привязка к учителю.", label: "Профиль", icon: <md-icon aria-hidden="true" className="shrink-0">account_circle</md-icon> },
   { id: "general", blurb: "Язык интерфейса и повторный показ первого запуска.", label: "Общие", icon: <md-icon aria-hidden="true" className="shrink-0" >settings</md-icon> },
   { id: "appearance", blurb: "Тема, размер и ширина текста в диалоге, логотип. Всё применяется сразу.", label: "Внешний вид", icon: <md-icon aria-hidden="true" className="shrink-0" >palette</md-icon> },
-  { id: "models", blurb: "Провайдеры и модель, с которой начинаются новые занятия.", label: "Модели и провайдеры", icon: <md-icon aria-hidden="true" className="shrink-0" >tune</md-icon> },
   { id: "agent", blurb: "Как агент объясняет, ищет в сети и хранит историю.", label: "Агент", icon: <md-icon aria-hidden="true" className="shrink-0" >smart_toy</md-icon> },
   { id: "skills", blurb: "Умения агента: включить, установить, изменить.", label: "Навыки", icon: <md-icon aria-hidden="true" className="shrink-0">extension</md-icon> },
   { id: "memory", blurb: "Что Graphy запоминает о том, как вам удобно учиться.", label: "Память", icon: <md-icon aria-hidden="true" className="shrink-0">psychology</md-icon> },
@@ -53,9 +52,6 @@ const INDEX: { section: SettingsSection; label: string; words: string }[] = [
   { section: "appearance", label: "Шрифт ответов", words: "serif шрифт с засечками гарнитура font" },
   { section: "appearance", label: "Анимации", words: "движение reduced motion анимация отключить" },
   { section: "appearance", label: "Логотип", words: "знак значок иконка favicon logo бренд fold route" },
-  { section: "models", label: "Провайдер", words: "login ключ api openai локальный сервер" },
-  { section: "models", label: "Модель по умолчанию", words: "model инструменты" },
-  { section: "models", label: "Глубина рассуждения", words: "reasoning effort thinking" },
   { section: "agent", label: "Стиль объяснения", words: "сократический диалог метод стиль" },
   { section: "skills", label: "Навыки", words: "скиллы skills" },
   { section: "memory", label: "Память", words: "подстраиваться стратегия наблюдения" },
@@ -222,29 +218,6 @@ function Appearance() {
 
 const LEVELS: Record<string, string> = { off: "Нет", minimal: "Минимальное", low: "Лёгкое", medium: "Среднее", high: "Высокое", xhigh: "Очень высокое", max: "Макс." };
 
-function Models() {
-  const agent = useRemote((r) => r.settings);
-  const models = useRemote((r) => r.models);
-  const current = models.find((m) => m.id === agent?.default_model);
-  const levels = current?.thinking_levels ?? ["off"];
-  const thinking = levels.includes(agent?.default_thinking ?? "off") ? agent?.default_thinking ?? "off" : levels[0] ?? "off";
-  return (
-    <>
-      <h3 className="md-typescale-title-small m-0 mb-2">{t("Провайдеры")}</h3>
-      <ProviderSetup />
-      <h3 className="md-typescale-title-small m-0 mb-1 mt-6">{t("Новые занятия")}</h3>
-      <Row label={t("Модель по умолчанию")} desc={t("Её получают новые занятия; у каждого занятия модель можно сменить отдельно")}>
-        <span className="selectable text-sm text-ink-2" data-default-model>{agent?.default_model || t("не выбрана")}</span>
-      </Row>
-      <ModelPicker value={agent?.default_model ?? ""} onPick={(id) => void updateAgentSettings({ default_model: id })} name="default-model" />
-      <Row label={t("Глубина рассуждения")} desc={t("Также доступна в поле ввода занятия")}>
-        <Seg label={t("Глубина рассуждения")} value={thinking} onChange={(v) => void updateAgentSettings({ default_thinking: v })}
-          options={levels.map((l) => ({ id: l, label: t(LEVELS[l] ?? l) }))} />
-      </Row>
-    </>
-  );
-}
-
 function AgentSection() {
   const agent = useRemote((r) => r.settings);
   const [key, setKey] = useState("");
@@ -321,8 +294,6 @@ function Body({ section, onFirstRun, onOpenLesson }: { section: SettingsSection;
       );
     case "appearance":
       return <Appearance />;
-    case "models":
-      return <Models />;
     case "agent":
       return <AgentSection />;
     case "skills":
@@ -396,7 +367,7 @@ function Body({ section, onFirstRun, onOpenLesson }: { section: SettingsSection;
 const ALL_GROUPS: { id: string; label: string; sections: SettingsSection[] }[] = [
   { id: "app", label: "Приложение", sections: ["profile", "general", "appearance", "keyboard"] },
   { id: "learning", label: "Обучение", sections: ["agent", "skills", "memory"] },
-  { id: "connect", label: "Подключение", sections: ["models", "usage"] },
+  { id: "connect", label: "Подключение", sections: ["usage"] },
   { id: "system", label: "Система", sections: ["data", "about"] },
 ];
 const SIMPLE_GROUPS: { id: string; label: string; sections: SettingsSection[] }[] = [
@@ -406,7 +377,7 @@ const SIMPLE_GROUPS: { id: string; label: string; sections: SettingsSection[] }[
 const GROUPS_UNUSED: { id: string; label: string; sections: SettingsSection[] }[] = [
   { id: "app", label: "Приложение", sections: ["profile", "general", "appearance", "keyboard"] },
   { id: "learning", label: "Обучение", sections: ["agent", "skills", "memory"] },
-  { id: "connect", label: "Подключение", sections: ["models", "usage"] },
+  { id: "connect", label: "Подключение", sections: ["usage"] },
   { id: "system", label: "Система", sections: ["data", "about"] },
 ];
 

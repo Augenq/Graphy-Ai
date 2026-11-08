@@ -94,7 +94,7 @@ function Report({ data }: { data: UsageOverview }) {
       </Card>
       {data.sessions.length > 0 && (
         <Card title={t("Самые затратные занятия")} wide>
-          <table className="usage-table">
+          <div className="usage-table-wrap"><table className="usage-table">
             <thead><tr><th scope="col">{t("Занятие")}</th><th scope="col">{t("Токены")}</th><th scope="col">{t("Кэш")}</th><th scope="col">{t("Стоимость")}</th></tr></thead>
             <tbody>
               {data.sessions.map((s) => (
@@ -106,7 +106,7 @@ function Report({ data }: { data: UsageOverview }) {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </Card>
       )}
     </>

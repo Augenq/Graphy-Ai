@@ -5,7 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 process.env.GRAPHY_HUB_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'hub-'));
-const { validateInitData, writeNoFollow, execChown, makeTicket, readTicket } = await import('./max-hub.mjs');
+process.env.GRAPHY_USERS_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'users-'));
+const { validateInitData, writeNoFollow, execChown, makeTicket, readTicket, setDefaultKey, ownKeyOf, markServiceKey, anonCharge, anonEstimate } = await import('./max-hub.mjs');
 
 const sign = (token, fields) => {
   const launch = Object.entries(fields).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => `${k}=${v}`).join('\n');
@@ -51,4 +52,43 @@ test('login ticket is permanent, reusable and tamper-proof', () => {
   assert.equal(readTicket(`${forged}.${sig}`), null);
   assert.equal(readTicket(`${body}.x${sig}`), null);
   assert.equal(readTicket(''), null);
+});
+
+test('service key: default token, own key and other providers survive, key is reported as "service"', () => {
+  const u = { id: '31337', osuid: 20031 };
+  const dir = path.join(process.env.GRAPHY_USERS_DIR, u.id); fs.mkdirSync(dir, { recursive: true });
+  const auth = path.join(dir, 'auth.json');
+  const read = () => JSON.parse(fs.readFileSync(auth, 'utf8'));
+  setDefaultKey(u);
+  assert.match(read().openrouter.key, /^gl-31337-[0-9a-f]{32}$/);
+  assert.equal(ownKeyOf(u), '');
+  const prov = () => ({ providers: [{ name: 'openrouter', configured: true, key_source: 'stored' }, { name: 'anthropic', configured: false }] });
+  assert.equal(markServiceKey(prov(), u).providers[0].key_source, 'service');
+  // the user saves their own key and another provider's key
+  fs.writeFileSync(auth, JSON.stringify({ openrouter: { key: 'sk-or-v1-mine1234567890' }, anthropic: { key: 'sk-ant-x' } }));
+  setDefaultKey(u); // a restart must not overwrite them
+  assert.equal(read().openrouter.key, 'sk-or-v1-mine1234567890');
+  assert.equal(ownKeyOf(u), 'sk-or-v1-mine1234567890');
+  assert.equal(markServiceKey(prov(), u).providers[0].key_source, 'stored');
+  // deleting the own key brings the service key back and keeps the other provider
+  fs.writeFileSync(auth, JSON.stringify({ anthropic: { key: 'sk-ant-x' } }));
+  setDefaultKey(u);
+  assert.match(read().openrouter.key, /^gl-31337-/);
+  assert.equal(read().anthropic.key, 'sk-ant-x');
+});
+
+test('public tier: only the three models, max_tokens capped, limits per token, IP and in total', () => {
+  assert.equal(anonEstimate({ model: 'openai/gpt-6.1-sol' }, 1000), null);
+  assert.equal(anonEstimate({ model: 'x/unknown' }, 1000), null);
+  const e = anonEstimate({ model: 'anthropic/claude-haiku-5.5', max_tokens: 999999 }, 3000);
+  assert.equal(e.out, 8192);
+  assert.ok(e.usd > 0.02 && e.usd < 0.03, String(e.usd));
+  assert.ok(anonEstimate({ model: 'anthropic/claude-sonnet-5.5' }, 30000).usd > anonEstimate({ model: 'deepseek/deepseek-v4.1-flash' }, 30000).usd * 5);
+  const caps = { token: 0.05, ip: 0.08, total: 0.1 }, day = '2099-01-01';
+  assert.ok(anonCharge('anon-a', '1.1.1.1', 0.03, caps, day));
+  assert.ok(!anonCharge('anon-a', '1.1.1.1', 0.03, caps, day), 'per-token cap');
+  assert.ok(anonCharge('anon-b', '1.1.1.1', 0.03, caps, day));
+  assert.ok(!anonCharge('anon-c', '1.1.1.1', 0.03, caps, day), 'per-IP cap');
+  assert.ok(anonCharge('anon-d', '2.2.2.2', 0.03, caps, day));
+  assert.ok(!anonCharge('anon-e', '3.3.3.3', 0.03, caps, day), 'total cap');
 });

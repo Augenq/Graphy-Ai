@@ -56,7 +56,7 @@
 /* --------------------------------------------------------------- content */
 .settings-main { flex: 1; min-width: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; scrollbar-gutter: stable; }
 .settings-column {
-  container: settings / inline-size; width: 100%; max-width: 880px; margin-inline: auto; padding: 40px 40px 96px;
+  container: settings / inline-size; width: 100%; max-width: 880px; margin-inline: auto; padding: 40px 40px 72px;
 }
 .settings-head { margin-bottom: 28px; }
 .settings-head h1 { width: fit-content; max-width: 100%; margin: 0; font: 400 29px/36px var(--font-display); letter-spacing: var(--display-tracking); color: var(--ink); }

@@ -21,7 +21,7 @@ export function ModelPicker({ value, onPick, name }: { value: string; onPick: (i
   if (models.length === 0) return <p role="status" className="md-typescale-body-medium m-0 text-warn-ui">{t("Моделей пока нет: подключите провайдера.")}</p>;
   return <div>
     <Field label={t("Найти модель")} value={filter} onInput={(e) => setFilter(e.currentTarget.value)} className="mb-2 w-full" autoComplete="off" />
-    <div role="radiogroup" aria-label={t("Модель")} className="flex max-h-72 flex-col gap-1 overflow-y-auto">
+    <div role="radiogroup" aria-label={t("Модель")} className="scroll-y flex max-h-72 flex-col gap-1">
       {shown.map((m) => <label key={m.id} className={`flex min-h-12 items-center gap-3 rounded-control px-3 py-2 ${value === m.id ? "bg-wash" : ""} ${m.tools ? "" : "opacity-40"}`}>
         <md-radio name={name} checked={value === m.id} disabled={!m.tools} aria-label={m.id} onchange={() => onPick(m.id)} />
         <span className="min-w-0 flex-1"><span className="md-typescale-title-small block truncate">{m.id}</span>
