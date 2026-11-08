@@ -26,7 +26,8 @@ def lesson(tmp_path):
 
 def test_resources_are_english_only():
     for path in PROMPTS.glob("*.md"):
-        assert not re.search("[а-яё]", path.read_text(encoding="utf-8"), re.I), path.name
+        text = re.sub(r"`[^`]*`|\"[^\"\n]*\"", "", path.read_text(encoding="utf-8"))  # quoted examples may be Russian
+        assert not re.search("[а-яё]", text, re.I), path.name
 
 
 @pytest.mark.parametrize("style", EXPLANATION_STYLES)

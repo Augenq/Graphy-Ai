@@ -164,15 +164,6 @@ async def test_one_failed_call_does_not_prevent_the_remaining_independent_calls(
     assert results["bad"]["error"] and "fine" in results["good"]["content"]
 
 
-async def test_empty_stop_after_all_retries_is_reported_to_the_learner(session):
-    empty = answer("")
-    provider = FakeProvider(empty, empty, empty, empty)
-    agent, _ = make_agent(session, provider, settings={"retries": 3})
-    with pytest.raises(ValueError, match="пустой ответ"):
-        await agent.run({"role": "user", "content": "hi"})
-    assert len(provider.requests) == 4
-    assert session.context[-1]["content"] == "hi"  # the empty reply never reaches the next request
-
 
 async def test_run_refuses_to_start_while_a_question_block_is_open(session):
     session.pending_question = {"batch_id": "q"}

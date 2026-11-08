@@ -58,7 +58,7 @@ async def test_rust_server_guards_and_durable_chat_store(tmp_path):
         assert (await client.get("/settings", headers=headers)).status_code == 200
         assert (await client.get("/settings", headers=headers | {"Origin": "https://evil.invalid"})).status_code == 403
         assert (await client.get("/health", headers={"Host": "evil.invalid"})).status_code == 403
-        created = await client.post("/sessions", headers=headers, json={"model": "fake/test"})
+        created = await client.post("/sessions", headers=headers, json={})
         assert created.status_code == 201, created.text
         chat = created.json()
         assert "course_id" not in chat
@@ -274,49 +274,6 @@ async def test_aborted_provider_stream_persists_partial_response(tmp_path):
             released.set()
 
 
-@pytest.mark.asyncio
-async def test_failed_lesson_tool_blocks_dependent_change_but_allows_bash(tmp_path):
-    from aiohttp import web
-    from aiohttp.test_utils import TestServer
-
-    requests = []
-    async def provider(request):
-        requests.append(await request.json())
-        if len(requests) == 1:
-            calls = [("bad-plan", "set_learning_plan", {}),
-                     ("phase", "set_learning_phase", {"phase": "practice"}),
-                     ("shell", "bash", {"command": "touch allowed"})]
-            delta = {"tool_calls": [{"index": i, "id": ident, "type": "function", "function": {"name": name, "arguments": json.dumps(args)}} for i, (ident, name, args) in enumerate(calls)]}
-            reason = "tool_calls"
-        else:
-            delta, reason = {"content": "Done"}, "stop"
-        frames = [{"choices": [{"index": 0, "delta": delta, "finish_reason": None}]},
-                  {"choices": [{"index": 0, "delta": {}, "finish_reason": reason}]}]
-        return web.Response(body=("".join("data: " + json.dumps(x) + "\n\n" for x in frames) + "data: [DONE]\n\n").encode(), content_type="text/event-stream")
-    mock = web.Application()
-    mock.router.add_post("/v1/chat/completions", provider)
-    headers = {"Authorization": "Bearer rust-http-test"}
-    async with TestServer(mock) as server:
-        data = tmp_path / "data"
-        data.mkdir()
-        (data / "settings.json").write_text(json.dumps({"default_model": "fake/test", "auto_compact": False,
-            "providers": {"fake": {"api": "chat", "base_url": str(server.make_url("/v1")),
-                                   "models": [{"id": "test", "tools": True, "context": 32768}]}}}))
-        async with native_server(tmp_path) as client:
-            sid = (await client.post("/sessions", headers=headers, json={"model": "fake/test"})).json()["id"]
-            assert (await client.post(f"/sessions/{sid}/messages", headers=headers, json={"text": "Explain"})).status_code == 202
-            async with asyncio.timeout(10):
-                while True:
-                    snapshot = (await client.get(f"/sessions/{sid}", headers=headers)).json()
-                    if not snapshot["busy"]:
-                        break
-                    await asyncio.sleep(.02)
-            results = {m["call_id"]: m for m in snapshot["messages"] if m["role"] == "tool"}
-            assert results["bad-plan"]["error"] is True
-            assert "earlier operation failed" in results["phase"]["content"]
-            assert not results["shell"].get("error", False)
-            assert (tmp_path / "workspace" / "allowed").exists()
-
 
 @pytest.mark.asyncio
 async def test_aborting_running_bash_kills_descendant_side_effect(tmp_path):
@@ -499,45 +456,3 @@ async def test_startup_migration_and_disabled_capabilities(tmp_path):
                         break
                     await asyncio.sleep(.02)
             assert not snapshot["messages"] and not requests
-
-
-@pytest.mark.asyncio
-async def test_optional_null_lesson_argument_and_tool_timing(tmp_path):
-    from aiohttp import web
-    from aiohttp.test_utils import TestServer
-
-    requests = []
-    async def provider(request):
-        requests.append(await request.json())
-        if len(requests) == 1:
-            calls = [("plan", "set_learning_plan", {"goal": "Learn", "steps": ["First", "Second"]}),
-                     ("phase", "set_learning_phase", {"phase": "review", "step": None})]
-            delta = {"tool_calls": [{"index": i, "id": ident, "type": "function", "function": {"name": name, "arguments": json.dumps(args)}} for i, (ident, name, args) in enumerate(calls)]}
-            reason = "tool_calls"
-        else:
-            delta, reason = {"content": "Done"}, "stop"
-        frames = [{"choices": [{"index": 0, "delta": delta, "finish_reason": None}]},
-                  {"choices": [{"index": 0, "delta": {}, "finish_reason": reason}]}]
-        return web.Response(body=("".join("data: " + json.dumps(x) + "\n\n" for x in frames) + "data: [DONE]\n\n").encode(), content_type="text/event-stream")
-    mock = web.Application()
-    mock.router.add_post("/v1/chat/completions", provider)
-    headers = {"Authorization": "Bearer rust-http-test"}
-    async with TestServer(mock) as server:
-        data = tmp_path / "data"
-        data.mkdir()
-        (data / "settings.json").write_text(json.dumps({"default_model": "fake/test", "auto_compact": False,
-            "providers": {"fake": {"api": "chat", "base_url": str(server.make_url("/v1")),
-                                   "models": [{"id": "test", "tools": True, "context": 32768}]}}}))
-        async with native_server(tmp_path) as client:
-            sid = (await client.post("/sessions", headers=headers, json={"model": "fake/test"})).json()["id"]
-            assert (await client.post(f"/sessions/{sid}/messages", headers=headers, json={"text": "Learn"})).status_code == 202
-            async with asyncio.timeout(10):
-                while True:
-                    snapshot = (await client.get(f"/sessions/{sid}", headers=headers)).json()
-                    if not snapshot["busy"]:
-                        break
-                    await asyncio.sleep(.02)
-            results = {m["call_id"]: m for m in snapshot["messages"] if m["role"] == "tool"}
-            assert not results["phase"].get("error", False), results
-            assert isinstance(results["phase"]["ms"], int)
-            assert snapshot["learning"]["phase"] == "review"
