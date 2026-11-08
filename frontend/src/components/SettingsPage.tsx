@@ -4,7 +4,6 @@ import { t, useLanguage } from "../lib/i18n";
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { isPhone, returnFocus, type SettingsSection } from "../lib/settings-route";
 import { radioKeys } from "../lib/radio-keys";
-import { DEFAULT_LOGO, setLogoChoice } from "../lib/logo-choice";
 import { resetInterfaceState } from "../lib/store";
 import { setWebKey, updateAgentSettings, useRemote } from "../lib/remote";
 import { ModelPicker } from "./ModelPicker";
@@ -13,7 +12,6 @@ import { SHORTCUTS } from "../lib/shortcuts";
 import { defaultSettings, updateSettings, useSettings, type Settings } from "../lib/settings";
 import { EXPLANATION_DEPTHS, EXPLANATION_PRESENTATIONS, EXPLANATION_STYLES } from "../lib/styles";
 import { InfoMark } from "./InfoMark";
-import { LogoPicker } from "./LogoPicker";
 import { Markdown } from "./Markdown";
 import { Select } from "./Select";
 import { ThemeChoice } from "./ThemePreviewCard";
@@ -31,7 +29,7 @@ export type { SettingsSection };
 const SECTIONS: { id: SettingsSection; label: string; blurb: string; icon: ReactNode }[] = [
   { id: "profile", blurb: "Ваш аккаунт MAX, роль и привязка к учителю.", label: "Профиль", icon: <md-icon aria-hidden="true" className="shrink-0">account_circle</md-icon> },
   { id: "general", blurb: "Язык интерфейса и повторный показ первого запуска.", label: "Общие", icon: <md-icon aria-hidden="true" className="shrink-0" >settings</md-icon> },
-  { id: "appearance", blurb: "Тема, размер и ширина текста в диалоге, логотип. Всё применяется сразу.", label: "Внешний вид", icon: <md-icon aria-hidden="true" className="shrink-0" >palette</md-icon> },
+  { id: "appearance", blurb: "Тема, размер и ширина текста в диалоге. Всё применяется сразу.", label: "Внешний вид", icon: <md-icon aria-hidden="true" className="shrink-0" >palette</md-icon> },
   { id: "agent", blurb: "Как агент объясняет, ищет в сети и хранит историю.", label: "Агент", icon: <md-icon aria-hidden="true" className="shrink-0" >smart_toy</md-icon> },
   { id: "skills", blurb: "Умения агента: включить, установить, изменить.", label: "Навыки", icon: <md-icon aria-hidden="true" className="shrink-0">extension</md-icon> },
   { id: "memory", blurb: "Что Graphy запоминает о том, как вам удобно учиться.", label: "Память", icon: <md-icon aria-hidden="true" className="shrink-0">psychology</md-icon> },
@@ -51,7 +49,6 @@ const INDEX: { section: SettingsSection; label: string; words: string }[] = [
   { section: "appearance", label: "Ширина колонки", words: "ширина узкая широкая" },
   { section: "appearance", label: "Шрифт ответов", words: "serif шрифт с засечками гарнитура font" },
   { section: "appearance", label: "Анимации", words: "движение reduced motion анимация отключить" },
-  { section: "appearance", label: "Логотип", words: "знак значок иконка favicon logo бренд fold route" },
   { section: "agent", label: "Стиль объяснения", words: "сократический диалог метод стиль" },
   { section: "skills", label: "Навыки", words: "скиллы skills" },
   { section: "memory", label: "Память", words: "подстраиваться стратегия наблюдения" },
@@ -209,9 +206,6 @@ function Appearance() {
           ]} />
         </Row>
       </Section>
-      <Section title={t("Логотип")} desc={t("Знак в боковой панели, на первом экране и во вкладке браузера.")}>
-        <LogoPicker />
-      </Section>
     </>
   );
 }
@@ -309,7 +303,7 @@ function Body({ section, onFirstRun, onOpenLesson }: { section: SettingsSection;
             </Button>
           </Row>
           <Row label={t("Настройки по умолчанию")}>
-            <Button variant="secondary" type="button" className={btnOutline} onClick={() => { updateSettings({ ...defaultSettings }); setLogoChoice(DEFAULT_LOGO); }}>
+            <Button variant="secondary" type="button" className={btnOutline} onClick={() => { updateSettings({ ...defaultSettings }); }}>
               {t("Вернуть")}
             </Button>
           </Row>

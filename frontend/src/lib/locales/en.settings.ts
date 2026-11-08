@@ -1,4 +1,4 @@
-// Settings as a page: sections, the theme cards, the text preview and the logo block.
+// Settings as a page: sections, the theme cards and the text preview.
 export default {
   "Назад к занятию": "Back to the lesson",
   "Назад к карте": "Back to the map",
@@ -10,7 +10,7 @@ export default {
   "Подключение": "Connection",
   "Система": "System",
   "Язык интерфейса и повторный показ первого запуска.": "Interface language and showing the first run again.",
-  "Тема, размер и ширина текста в диалоге, логотип. Всё применяется сразу.": "Theme, text size and width in the lesson, the logo. Everything applies at once.",
+  "Тема, размер и ширина текста в диалоге. Всё применяется сразу.": "Theme, text size and width in the lesson. Everything applies at once.",
   "Провайдеры и модель, с которой начинаются новые занятия.": "Providers and the model new lessons start with.",
   "Как агент объясняет, ищет в сети и хранит историю.": "How the agent explains, searches the web and keeps history.",
   "Умения агента: включить, установить, изменить.": "Agent skills: turn on, install, edit.",
@@ -29,9 +29,4 @@ export default {
   "Для ответов и чтения занятия": "For answers and lesson reading",
   "Так будет выглядеть ответ в диалоге": "This is how an answer looks in the lesson",
   "Определитель — это **одно число**, которое матрица «рассказывает» о себе. Для матрицы 2×2 оно считается так:": "A determinant is **one number** that a matrix “tells” about itself. For a 2×2 matrix it is computed like this:",
-  "Логотип": "Logo",
-  "Знак в боковой панели, на первом экране и во вкладке браузера.": "The mark in the side panel, on the first screen and in the browser tab.",
-  "Сейчас: {0}": "Now: {0}",
-  "чистый": "clean",
-  "оригинал": "original",
 } as Record<string, string>;
