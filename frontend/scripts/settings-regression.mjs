@@ -28,8 +28,6 @@ const fresh = (path) => import(/* @vite-ignore */ `${path}?t=${Date.now()}${copi
 export async function runSettingsRegression(theme = 'dark') {
   const { updateSettings, getSettings, defaultSettings } = await import('/src/lib/settings.ts');
   const { getState, patchSession } = await import('/src/lib/store.ts');
-  const { setLogoChoice, getLogoId } = await import('/src/lib/logo-choice.ts');
-  const { logoCandidates } = await import('/src/lib/logo-candidates.ts');
   if (!q('link[rel="icon"]')) document.head.append(Object.assign(document.createElement('link'), { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' })); // the fixture page has none
   updateSettings({ language: 'ru', theme, textSize: 'm', width: 'medium' });
   setLogoChoice('02');
@@ -115,7 +113,6 @@ export async function runSettingsRegression(theme = 'dark') {
   assert(!location.hash, 'Leaving a deep-linked Settings removes the hash');
   assert(history.length >= length, 'History was not rewritten by the tests');
   // a real page load of the address in a frame: the section is there, the default logo is FOLD, the choice made here is kept
-  localStorage.removeItem('graphy-logo-v1');
   const frame = document.createElement('iframe');
   frame.style.cssText = 'position:fixed;left:-9999px;top:0;width:1440px;height:900px;border:0';
   frame.src = `${location.pathname}?only=zzz&theme=${getSettings().theme === 'light' ? 'light' : 'dark'}#settings/models`;
@@ -124,8 +121,6 @@ export async function runSettingsRegression(theme = 'dark') {
   const inner = frame.contentDocument;
   assert(inner.querySelector('.settings-head h1')?.textContent === 'Модели и провайдеры' && inner.querySelector('.settings-nav md-list-item[data-aria-current="page"]')?.dataset.section === 'models', 'The reloaded page shows the addressed section as current');
   frame.contentWindow.location.hash = 'settings/appearance';
-  await until(() => inner.querySelector('[data-settings-page][data-section="appearance"] [data-logo]'), 'Appearance in the frame', 5000);
-  assert(inner.querySelector('[data-logo][aria-checked="true"]')?.dataset.logo === '02', 'After a fresh load the logo is the default 02');
   frame.remove();
   ok('Addressable sections, reload, Back/Forward, #settings, #skills, unknown section, Back to where it was opened');
 
@@ -234,72 +229,26 @@ export async function runSettingsRegression(theme = 'dark') {
   assert(radios('Размер текста').length === 3 && radios('Размер текста').every((r, i) => qa('.choice-label', r)[0].textContent && (r.getAttribute('aria-checked') === 'true') === (i === 1)), 'Size choices: three options, the middle one chosen, each labelled');
   ok('Text size and width: radios with samples; a live answer with a formula changes at once with the dialog\'s own variables', { sizes, widths });
 
-  // ---- 7. logo: 23 tiles, FOLD by default, applied in the sidebar, the first screen and the tab icon, saved, ROUTE by choice
-  await fresh('/src/lib/logo-choice.ts');
-  localStorage.removeItem('graphy-logo-v1');
-  assert((await fresh('/src/lib/logo-choice.ts')).getLogoId() === '02', 'Without a saved choice the logo is 02 (FOLD)');
-  const tiles = radios('Логотип');
-  assert(tiles.length === 23 && tiles[0].dataset.logo === 'route' && logoCandidates.length === 22 && tiles.slice(1).every((t, i) => t.dataset.logo === logoCandidates[i].id), '22 traced variants and the clean 16 ROUTE are offered');
-  assert(tiles.every(t => /^\w[\w.]*\s/.test(t.getAttribute('aria-label')) && t.querySelector('.logo-tile-label b') && t.querySelector('svg.graphy-mark')), 'Each tile is labelled with its id and name');
-  assert(q('[data-logo-current]').dataset.logoCurrent === '02' && /02 FOLD/.test(q('[data-logo-current]').textContent), 'The block says what is chosen now: 02 FOLD');
-  const fold = logoCandidates.find(s => s.id === '02');
-  const d = sel => q(`${sel} path`)?.getAttribute('d');
-  assert(getLogoId() === '02' && checked('Логотип').dataset.logo === '02', 'FOLD is the chosen tile by default');
-  assert(+getComputedStyle(checked('Логотип').querySelector('.logo-tile-check')).opacity === 1 && tiles.filter(t => t !== checked('Логотип')).every(t => +getComputedStyle(t.querySelector('.logo-tile-check')).opacity === 0), 'Only the chosen tile shows the tick');
-  assert(getComputedStyle(checked('Логотип')).borderTopColor !== getComputedStyle(tiles[0]).borderTopColor, 'The chosen tile has its own frame');
-  const docked = !!q('nav[data-sidebar] .sidebar-logo svg.graphy-mark'); // a narrow window keeps the side panel closed (an overlay)
-  if (docked) assert(d('nav[data-sidebar] .sidebar-logo svg.graphy-mark') === fold.d, 'The side panel shows FOLD');
-  if (q('.home-mark')) assert(d('.home-mark') === fold.d, 'The first screen shows FOLD');
-  const icon = () => q('link[rel="icon"]').getAttribute('href');
-  assert(icon() === '/favicon.svg', 'The tab icon is the static favicon.svg (FOLD)');
-  const svgFile = await (await fetch('/favicon.svg')).text();
-  assert(svgFile.includes(`viewBox="${fold.viewBox}"`) && svgFile.includes(fold.d.slice(0, 60)) && svgFile.includes('prefers-color-scheme:dark') && /#f0f0f0/.test(svgFile), 'The static favicon is FOLD with a dark-scheme colour');
-  const five = logoCandidates.find(s => s.id === '05');
-  click(tiles.find(t => t.dataset.logo === '05'));
-  await wait(120);
-  assert(getLogoId() === '05' && localStorage.getItem('graphy-logo-v1') === '05', 'Choosing a tile saves it');
-  assert((!docked || d('nav[data-sidebar] .sidebar-logo svg.graphy-mark') === five.d) && (!q('.home-mark') || d('.home-mark') === five.d), 'The new mark is in the side panel (and on the first screen) at once');
-  assert(icon().startsWith('data:image/svg+xml') && decodeURIComponent(icon()).includes(five.d.slice(0, 40)) && decodeURIComponent(icon()).includes('prefers-color-scheme:dark'), 'The tab icon follows, with a dark-scheme colour');
-  assert((await fresh('/src/lib/logo-choice.ts')).getLogoId() === '05', 'A fresh load reads the saved choice');
-  checked('Логотип').focus();
-  key(checked('Логотип'), 'ArrowRight');
-  await wait(100);
-  assert(getLogoId() === '06' && document.activeElement.dataset.logo === '06', 'Arrow keys move the logo choice and the focus');
-  click(tiles[0]);
-  await wait(120);
-  const routeMark = q('nav[data-sidebar] .sidebar-logo svg.graphy-mark') ?? tiles[0].querySelector('svg');
-  assert(getLogoId() === 'route' && routeMark.querySelector('path').getAttribute('d').startsWith('M18.52 3.75') && getComputedStyle(routeMark).fill === 'none' && getComputedStyle(routeMark).stroke === getComputedStyle(routeMark).color, 'The clean ROUTE is drawn as a stroke in the text colour');
-  assert(decodeURIComponent(icon()).includes('M18.52 3.75'), 'The tab icon follows ROUTE as well');
-  // «Настройки по умолчанию» brings FOLD back
-  click(nav('data'));
-  await until(() => section() === 'data', 'Data section');
-  const restore = qa('button', page()).find(b => b.textContent.trim() === 'Вернуть');
-  click(restore);
-  await wait(150);
-  assert(getLogoId() === '02' && icon() === '/favicon.svg', '«Настройки по умолчанию» return the logo to FOLD');
-  updateSettings({ ...defaultSettings, language: 'ru', theme });
-  ok('Logo: 23 tiles with ids and names, FOLD (02) by default, frame + tick, sidebar/first screen/favicon, saved, ROUTE by choice, reset', { favicon: 'static favicon.svg is FOLD' });
-
   // ---- 8. search and Escape inside the page
   click(nav('appearance'));
   await until(() => section() === 'appearance', 'Appearance');
   const input = q('input[aria-label="Поиск по настройкам"]');
-  setText(input, 'логотип', HTMLInputElement.prototype);
+  setText(input, 'размер текста', HTMLInputElement.prototype);
   await wait(150);
   const hit = q('.settings-nav [aria-label="Результаты поиска"] button');
-  assert(hit && /Логотип/.test(hit.textContent), 'Search finds the logo block');
+  assert(hit && /Размер|Внешний вид|Текст/i.test(hit.textContent), 'Search finds the appearance block');
   setText(input, 'размер', HTMLInputElement.prototype);
   await wait(100);
   key(input, 'Escape');
   await wait(120);
   assert(input.value === '' && page(), 'Escape in the search clears it and stays in Settings');
-  setText(input, 'логотип', HTMLInputElement.prototype);
+  setText(input, 'размер текста', HTMLInputElement.prototype);
   await wait(150);
   click(q('.settings-nav [aria-label="Результаты поиска"] button'));
   await wait(200);
   assert(input.value === '' && section() === 'appearance' && document.activeElement === title(), 'A search hit opens its section and focuses the title');
   await leave();
-  ok('Search finds the logo, Escape clears it first, a hit focuses the title');
+  ok('Search finds a setting, Escape clears it first, a hit focuses the title');
   assert(!page() && !location.hash, 'Settings are closed at the end');
   return { pass: true, checks: checks.map(c => c.check), details: checks };
 }

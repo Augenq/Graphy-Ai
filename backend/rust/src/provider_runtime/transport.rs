@@ -74,7 +74,11 @@ impl Response {
                 .or_else(|| v["input_tokens_details"]["cached_tokens"].as_i64())
                 .or_else(|| v["prompt_tokens_details"]["cached_tokens"].as_i64())
                 .unwrap_or(0);
-            u["input"] = json!((total - cached).max(0));
+            let written = v["prompt_tokens_details"]["cache_write_tokens"].as_i64().unwrap_or(0);
+            u["input"] = json!((total - cached - written).max(0));
+            if written > 0 {
+                u["cache_write"] = json!(written);
+            }
             u["output"] = json!(v["output_tokens"]
                 .as_i64()
                 .or_else(|| v["completion_tokens"].as_i64())

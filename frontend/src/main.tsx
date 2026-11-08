@@ -3,7 +3,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { initBackend } from "./lib/backend";
-import { initLogo } from "./lib/logo-choice";
 import { initSettings } from "./lib/settings";
 import { initRipple } from "./lib/ripple";
 import "./styles/motion.css";
@@ -16,7 +15,6 @@ import.meta.glob(["./styles/*.css", "!./styles/mobile.css"], { eager: true });
 
 
 initSettings();
-initLogo();
 initBackend();
 initRipple();
 

@@ -39,7 +39,7 @@ export function MarkGlyph({ shape, size = 24, className, title }: { shape: LogoS
   );
 }
 
-/** The Graphy mark the learner chose in Settings → Appearance (FOLD by default). */
+/** The Graphy mark (logo ATLAS, fixed). */
 export function GraphyMark({ size = 24, className, title }: { size?: number; className?: string; title?: string }) {
   return <MarkGlyph shape={useLogoChoice()} size={size} className={className} title={title} />;
 }

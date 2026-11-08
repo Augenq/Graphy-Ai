@@ -93,12 +93,12 @@
 .theme-card[aria-checked="true"] { border-color: var(--ink); background: var(--surface-input); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); }
 .theme-card-frame { position: relative; display: block; aspect-ratio: 8 / 5; overflow: hidden; border-radius: 9px; box-shadow: inset 0 0 0 1px var(--rule); }
 .theme-card-svg { display: block; width: 100%; height: 100%; }
-.theme-card-check, .choice-check, .logo-tile-check {
+.theme-card-check, .choice-check {
   display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--paper);
   opacity: 0; transform: scale(0.6); transition: opacity var(--dur-fast) var(--ease-default), transform var(--dur-slow) var(--ease-out-quint);
 }
 .theme-card-check { position: absolute; top: 7px; right: 7px; width: 20px; height: 20px; box-shadow: 0 0 0 2px var(--paper); }
-.theme-card[aria-checked="true"] .theme-card-check, .choice-option[aria-checked="true"] .choice-check, .logo-tile[aria-checked="true"] .logo-tile-check { opacity: 1; transform: none; }
+.theme-card[aria-checked="true"] .theme-card-check, .choice-option[aria-checked="true"] .choice-check .logo-tile-check { opacity: 1; transform: none; }
 .theme-card-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 0 4px 4px; }
 .theme-card-text { display: flex; flex-direction: column; min-width: 0; }
 .theme-card-name { font: 400 13.5px/18px var(--font-sans); }
@@ -134,31 +134,15 @@
   background: var(--surface-page); box-shadow: 0 0 0 1px var(--rule); transition: width var(--dur-slow) var(--ease-out-quint);
 }
 
-/* ------------------------------------------------------------ logo grid */
-.logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; padding-top: 16px; }
-.logo-tile {
-  position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; padding: 14px 4px 8px;
-  border: 2px solid var(--rule); border-radius: 12px; background: transparent; color: var(--ink-2); cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-default), background-color var(--dur-fast) var(--ease-default);
-}
-.logo-tile:hover { border-color: var(--rule-2); background: color-mix(in srgb, var(--ink) 3%, transparent); }
-.logo-tile[aria-checked="true"] { border-color: var(--ink); background: var(--surface-input); color: var(--ink); }
-.logo-tile-mark { margin-bottom: 8px; color: var(--ink); }
-.logo-tile-label { max-width: 100%; text-align: center; overflow-wrap: anywhere; font: 400 12px/16px var(--font-sans); }
-.logo-tile-label b { font-weight: 600; }
-.logo-tile-note { min-height: 14px; color: var(--ink-3); font: 400 11px/14px var(--font-sans); }
-.logo-tile-check { position: absolute; top: 5px; right: 5px; width: 16px; height: 16px; }
-.logo-current { margin: 12px 0 0; color: var(--ink-3); font: 400 13px/18px var(--font-sans); }
-
 /* ------------------------------------------------------------- focus, a11y */
-.theme-card:focus-visible, .choice-option:focus-visible, .logo-tile:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
+.theme-card:focus-visible, .choice-option:focus-visible { outline: 2px solid var(--focus-indicator); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .settings-preview-column { transition: none; }
-  .theme-card-check, .choice-check, .logo-tile-check { transform: none; transition: none; }
+  .theme-card-check, .choice-check { transform: none; transition: none; }
 }
 @media (forced-colors: active) {
-  .theme-card[aria-checked="true"], .choice-option[aria-checked="true"], .logo-tile[aria-checked="true"] { border-color: Highlight; }
-  .theme-card-check, .choice-check, .logo-tile-check { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  .theme-card[aria-checked="true"], .choice-option[aria-checked="true"] { border-color: Highlight; }
+  .theme-card-check, .choice-check { background: Highlight; color: HighlightText; forced-color-adjust: none; }
 }
 
 /* A narrow content area: the control goes under its name, the three theme cards stay in one row. */
@@ -195,7 +179,6 @@
   .settings-row { min-height: 56px; padding-block: 16px; }
   .settings-body .ui-field { max-width: 100%; }
   .theme-card-hint { font-size: 11px; line-height: 14px; }
-  .logo-grid { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
   .choice-option { height: 72px; }
   .settings-preview-column { padding: 12px 16px; }
 }

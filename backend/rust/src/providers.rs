@@ -379,6 +379,23 @@ fn payload(data: &Value) -> Result<Value, String> {
     let (path, mut body) = match api {
         "chat" => {
             let mut body = json!({"model":model_id,"messages":history,"stream":true,"stream_options":{"include_usage":true},"max_tokens":limit});
+            if provider == "openrouter" {
+                // Sticky routing keeps follow-up requests of one session on the same upstream cache.
+                if truthy(&data["session_id"]) {
+                    body["session_id"] = data["session_id"].clone();
+                }
+                // Claude needs explicit caching; other upstreams cache automatically.
+                if model_id.trim_start_matches('~').starts_with("anthropic/") {
+                    body["cache_control"] = json!({"type":"ephemeral"});
+                    // History is rewritten between turns (app state is attached only to the latest
+                    // learner message), so also pin tools + system, which stay identical.
+                    if let Some(first) = body["messages"].get_mut(0).filter(|m| m["role"] == "system") {
+                        if let Some(content) = first["content"].as_str().map(str::to_owned) {
+                            first["content"] = json!([{"type":"text","text":content,"cache_control":{"type":"ephemeral"}}]);
+                        }
+                    }
+                }
+            }
             if !tools.is_empty() {
                 body["tools"] = json!(tools
                     .iter()
