@@ -1,4 +1,9 @@
 /** Animated agent/network loader: orbiting rings, pulsing links, traveling signals, breathing core. No logo. */
+// Remembers that a boot/sign-in gate was already on screen, so the next gate does not replay its fade-in (that read as a blink).
+let gateSeen = typeof document !== "undefined" && !!document.querySelector(".boot"); // the static boot screen in index.html counts
+export const gateWasSeen = () => gateSeen;
+export const markGateSeen = () => { gateSeen = true; };
+
 export function AgentLoader({ size = 168, label }: { size?: number; label?: string }) {
   const C = 90;
   const outer = [

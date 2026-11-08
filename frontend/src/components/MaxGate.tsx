@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "./ui/index";
-import { AgentLoader } from "./AgentLoader";
+import { AgentLoader, gateWasSeen, markGateSeen } from "./AgentLoader";
 import { chooseRole, openExternal, useMax } from "../lib/max";
 import { describe } from "../lib/api";
 
@@ -11,7 +11,18 @@ export function MaxGate() {
   const [error, setError] = useState("");
 
   if (max.status === "auth") {
-    return <Shell><AgentLoader size={148} label="Вход" /><p className="max-gate-text">Входим через MAX…</p></Shell>;
+    // Same centred layout as ConnectionGate, so the loader does not jump from the left edge of the column to the centre.
+    const still = gateWasSeen();
+    markGateSeen();
+    return (
+      <div className="graphy-workspace relative flex h-full w-full items-center justify-center overflow-hidden bg-paper font-sans text-ink">
+        <div className={`agent-gate${still ? " agent-gate-still" : ""}`} role="status" aria-live="polite" aria-busy="true">
+          <AgentLoader size={168} />
+          <span className="graphy-wordmark agent-gate-brand">Graphy</span>
+          <p className="agent-gate-status">Входим через MAX…</p>
+        </div>
+      </div>
+    );
   }
   if (max.status === "needs-max") {
     return <Shell>

@@ -102,6 +102,7 @@
   padding: 24px;
   animation: agent-gate-in 260ms cubic-bezier(.2, 0, 0, 1) both;
 }
+.agent-gate-still, .agent-gate-still .agent-gate-status { animation: none; }
 .agent-gate-brand { font-size: 34px; line-height: 40px; margin-top: 2px; }
 .agent-gate-status {
   margin: 0;

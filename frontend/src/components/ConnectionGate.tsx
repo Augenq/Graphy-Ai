@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "./ui/index";
-import { AgentLoader } from "./AgentLoader";
+import { AgentLoader, gateWasSeen, markGateSeen } from "./AgentLoader";
 import { t } from "../lib/i18n";
 import { retryBackend, useBackend } from "../lib/backend";
 import { useRemote } from "../lib/remote";
@@ -27,13 +27,16 @@ export function ConnectionGate({ fadeOut = false }: { fadeOut?: boolean }) {
     t("Почти готово…"),
   ];
 
+  const still = gateWasSeen();
+  markGateSeen();
   return (
     <div className={`graphy-workspace relative flex h-full w-full items-center justify-center overflow-hidden bg-paper font-sans text-ink${fadeOut ? " agent-gate-out" : ""}`}>
-      <div className="agent-gate" role="status" aria-live="polite" aria-busy={waiting && !fadeOut}>
+      <div className={`agent-gate${still ? " agent-gate-still" : ""}`} role="status" aria-live="polite" aria-busy={waiting && !fadeOut}>
         <AgentLoader size={168} />
         <span className="graphy-wordmark agent-gate-brand">Graphy</span>
-        {waiting && !fadeOut && (
-          <p className="agent-gate-status" key={phase}>{lines[Math.min(phase, lines.length - 1)]}</p>
+        {!failed && (
+          // Always keep the line's space (hidden when idle or fading out) so the loader never shifts when the text goes away.
+          <p className="agent-gate-status" key={fadeOut ? "out" : phase} aria-hidden={!waiting || fadeOut || undefined} style={!waiting || fadeOut ? { visibility: "hidden" } : undefined}>{lines[Math.min(phase, lines.length - 1)]}</p>
         )}
         {failed && !fadeOut && (
           <div className="agent-gate-fail">
