@@ -49,19 +49,11 @@ Graphy — агент для школы: учителю помогает гот�
   </tr>
   <tr>
     <td><img src="docs/screenshots/school-results.jpg" alt="Результаты теста"></td>
-    <td><img src="docs/screenshots/settings-appearance.jpg" alt="Настройки: внешний вид"></td>
+    <td><img src="docs/screenshots/settings-appearance.jpg" alt="Настройки"></td>
   </tr>
   <tr>
     <td align="center">Результаты и ручная проверка</td>
-    <td align="center">Настройки: внешний вид</td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/school-home.jpg" alt="Школа: главный экран"></td>
-    <td><img src="docs/screenshots/settings-agent.jpg" alt="Настройки: агент"></td>
-  </tr>
-  <tr>
-    <td align="center">Школа: главный экран</td>
-    <td align="center">Настройки: агент и провайдер</td>
+    <td align="center">Настройки</td>
   </tr>
 </table>
 
