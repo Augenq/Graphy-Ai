@@ -1,0 +1,13 @@
+[Unit]
+Description=Graphy sandbox egress policy (docker network graphy-net)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/graphy-firewall.sh apply
+ExecStop=/usr/local/sbin/graphy-firewall.sh remove
+
+[Install]
+WantedBy=multi-user.target

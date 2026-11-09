@@ -11,6 +11,8 @@ export interface HubClass { code: string; title: string; created: number; invite
 export interface MaxState {
   hub: boolean;
   status: "off" | "auth" | "ready" | "needs-max";
+  /** the administrator blocked this account: show the server message instead of "open the link from the bot" */
+  blocked?: boolean;
   user?: MaxUser;
   token?: string;
   bot?: string;
@@ -59,31 +61,34 @@ export async function initMax(config: { hub?: boolean; bot?: string }): Promise<
   const ticket = new URLSearchParams(location.search).get("t");
   let stored = "";
   try { stored = localStorage.getItem("graphy-hub-token") || ""; } catch { /* private mode */ }
+  let blockedStored = false;
   const viaStored = async () => {
     if (!stored) return null;
     try {
       const r = await fetch("/hub/me", { headers: { Authorization: `Bearer ${stored}` } });
       if (r.ok) { const d = await r.json(); set({ status: "ready", user: d.user, token: stored, bot: d.bot || config.bot }); return { url: location.origin, token: stored }; }
+      if (r.status === 403) { const d = await r.json().catch(() => ({})); if (d?.error?.code === "blocked") { set({ status: "needs-max", message: d.error.message, blocked: true }); blockedStored = true; } }
     } catch { /* fall through */ }
     return null;
   };
-  if (!initData && !ticket) return (await viaStored()) ?? (set({ status: "needs-max" }), null);
+  if (!initData && !ticket) { const s = await viaStored(); if (s) return s; if (!blockedStored) set({ status: "needs-max" }); return null; }
   // network hiccups are retried quietly; a rejected link falls back to the saved session, then to the «open from the bot» screen
-  let lastMessage = "";
+  let lastMessage = "", lastBlocked = false;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const r = await fetch("/hub/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(initData ? { initData } : { ticket }) });
       const data = await r.json().catch(() => ({}));
-      if (!r.ok) { lastMessage = data?.error?.message || ""; break; }
+      if (!r.ok) { lastMessage = data?.error?.message || ""; lastBlocked = data?.error?.code === "blocked"; break; }
       set({ status: "ready", user: data.user, token: data.token, bot: data.bot || config.bot, start: data.start });
       if (!initData) { try { localStorage.setItem("graphy-hub-token", data.token); history.replaceState(null, "", location.pathname + location.hash); } catch { /* optional */ } }
       try { window.WebApp?.ready?.(); } catch { /* optional */ }
       return { url: location.origin, token: data.token };
     } catch { await new Promise((res) => setTimeout(res, 1500)); }
   }
+  if (lastBlocked) { set({ status: "needs-max", message: lastMessage, blocked: true }); return null; }
   const saved = await viaStored();
   if (saved) return saved;
-  set({ status: "needs-max", message: lastMessage });
+  if (!blockedStored) set({ status: "needs-max", message: lastMessage });
   return null;
 }
 

@@ -180,3 +180,15 @@ test('unauthorized read of attempts/draft is refused', () => {
   assert.throws(() => e.call(e.S2, 'GET', `${base}/results/S1`), (err) => err.status === 403);
   assert.equal(e.call(e.S2, 'GET', `${base}/attempts`).body.attempts.length, 0); // S2 only sees own
 });
+
+test('student and teacher names carry the @username when there is one', () => {
+  const env = setup();
+  const users = { T: { first_name: 'Teach', username: 'teacher_t' }, S1: { first_name: 'Ann', last_name: 'Lee', username: 'ann_l' }, S2: { first_name: '', last_name: '', username: 'only_nick' }, S3: { first_name: 'Bob' } };
+  const s = createSchool({ dir: fs.mkdtempSync(path.join(os.tmpdir(), 'school-n-')), classes: () => ({ c1: { code: 'c1', title: '9б', teacher: 'T', students: { S1: {}, S2: {}, S3: {} } } }), users: () => users, now: () => 1_000_000, flushMs: 1e9, rnd: () => 0 });
+  const T = { id: 'T', role: 'teacher' };
+  const made = s.handle(T, 'POST', '/hub/school/assignments', new URLSearchParams(), { class_codes: ['c1'], kind: 'material', title: 'М', material: { name: 'a.txt', mime: 'text/plain', text: 'x' } });
+  const id = made.body.assignments[0].id;
+  const detail = s.handle(T, 'GET', `/hub/school/assignments/${id}`, new URLSearchParams(), {});
+  const names = detail.body.assignment.recipients.map((r) => r.name);
+  assert.deepEqual(names.sort(), ['@only_nick', 'Ann Lee (@ann_l)', 'Bob'].sort());
+});

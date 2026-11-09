@@ -168,7 +168,12 @@ export function createSchool(deps) {
   const indexAdd = (a) => { if (!byClass.has(a.class_code)) byClass.set(a.class_code, new Set()); byClass.get(a.class_code).add(a.id); };
   for (const a of Object.values(store.assignments)) indexAdd(a);
 
-  const name = (id) => { const u = deps.users()[id]; return u ? ([u.first_name, u.last_name].filter(Boolean).join(' ') || u.username || `id${id}`) : String(id); };
+  const name = (id) => { // "Имя Фамилия (@username)": the username is shown wherever the person is, when there is one
+    const u = deps.users()[id];
+    if (!u) return String(id);
+    const full = [u.first_name, u.last_name].filter(Boolean).join(' ');
+    return full ? (u.username ? `${full} (@${u.username})` : full) : (u.username ? `@${u.username}` : `id${id}`);
+  };
   const cls = (code) => deps.classes()[code];
   const recipients = (a) => { const c = cls(a.class_code); if (!c) return []; const ids = Object.keys(c.students); return a.student_ids ? ids.filter((i) => a.student_ids.includes(i)) : ids; };
   const addressed = (a, uid) => recipients(a).includes(uid);

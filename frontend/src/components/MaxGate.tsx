@@ -24,6 +24,12 @@ export function MaxGate() {
       </div>
     );
   }
+  if (max.status === "needs-max" && max.blocked) {
+    return <Shell>
+      <h1 className="max-gate-title">Доступ закрыт</h1>
+      <p className="max-gate-text">{max.message || "Ваш аккаунт заблокирован администратором. Если это ошибка, напишите ему."}</p>
+    </Shell>;
+  }
   if (max.status === "needs-max") {
     return <Shell>
       <h1 className="max-gate-title">Откройте ссылку из чата с ботом</h1>
