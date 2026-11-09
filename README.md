@@ -109,7 +109,7 @@ Graphy — агент для школы: учителю помогает гот�
 # или: docker build -t graphy:latest .         # дольше, всё внутри Docker
 
 # или загрузить готовый образ: graphy-image.tar.gz из раздела Releases
-# https://github.com/Augenq/Graphy-Ai/releases/latest  (sha256: cb2873b50c51ab3b6f155e26421b2740bf9bee783e5f459f3b50150e175ff636)
+# https://github.com/Augenq/Graphy-Ai/releases/latest  (sha256: 14de26332be5aab233c552c8ddc1241c4723f2a47a6b8fa05fb1dd1548677d10)
 docker load < graphy-image.tar.gz              # → graphy:latest
 ```
 
